@@ -235,7 +235,7 @@ Version 1: 112.628 ms
 Version 2: 347.1 ms
 ```
 
-Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235 ns on my CPU. The explanation I can think of is that the compiler just did a better job on the C code.
+Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235ns on my CPU. The explanation I can think of is that the compiler just did a better job on the C code.
 
 ## Thread safety
 

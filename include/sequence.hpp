@@ -29,7 +29,7 @@ namespace sequences
     template<typename T, typename Seq1, typename Seq2>
     class concat_sequence;
 
-    template<typename T, typename Derived>
+    template<typename T, typename Derived, typename Stored=Derived>
     class base_sequence
     {
     public:
@@ -38,9 +38,9 @@ namespace sequences
 
         Derived & self() const { return *const_cast<Derived*>(static_cast<const Derived*>(this)); }
 
-        virtual_sequence<T, Derived> make_virtual() const { return {self()}; }
+        virtual_sequence<T, Stored> make_virtual() const { return {self()}; }
 
-        operator virtual_sequence<T, Derived>() const { return make_virtual(); }
+        operator virtual_sequence<T, Stored>() const { return make_virtual(); }
 
         size_type size() const
         {
@@ -75,23 +75,23 @@ namespace sequences
         iterator end() const { return { self(), nullptr }; }
 
         template<typename Predicate>
-        where_sequence<T, Derived, Predicate> where(Predicate p) const
+        where_sequence<T, Stored, Predicate> where(Predicate p) const
         {
             return { self(), p };
         }
 
         template<typename Fn>
-        select_sequence<T, Derived, Fn> select(Fn fn) const
+        select_sequence<T, Stored, Fn> select(Fn fn) const
         {
             return { self(), fn };
         }
 
-        take_sequence<T, Derived> take(int n) const
+        take_sequence<T, Stored> take(int n) const
         {
             return {self(),n};
         }
 
-        skip_sequence<T, Derived> skip(int n) const
+        skip_sequence<T, Stored> skip(int n) const
         {
             return {self(),n};
         }
@@ -139,20 +139,20 @@ namespace sequences
 
         // Comparisons
 
-        template<typename T2, typename Derived2>
-        bool operator==(const base_sequence<T2,Derived2> & other) const
+        template<typename T2, typename Derived2,typename Stored2>
+        bool operator==(const base_sequence<T2,Derived2,Stored2> & other) const
         {
             return equals(other);
         }
 
-        template<typename T2, typename Derived2>
-        bool operator<(const base_sequence<T2,Derived2> & other) const
+        template<typename T2, typename Derived2,typename Stored2>
+        bool operator<(const base_sequence<T2,Derived2,Stored2> & other) const
         {
             return lexographical_compare(other);
         }
 
-        template<typename T2, typename Derived2, typename Eq = std::equal_to<T>>
-        bool equals(const base_sequence<T2,Derived2> & other, Eq eq = {}) const
+        template<typename T2, typename Derived2, typename Stored2, typename Eq = std::equal_to<T>>
+        bool equals(const base_sequence<T2,Derived2,Stored2> & other, Eq eq = {}) const
         {
             auto i1 = self().first();
             auto i2 = other.self().first();
@@ -167,8 +167,8 @@ namespace sequences
             return !i1 && !i2;
         }
 
-        template<typename T2, typename Derived2, typename Less = std::less<T>>
-        bool lexographical_compare(const base_sequence<T2,Derived2> & other, Less lt = {}) const
+        template<typename T2, typename Derived2, typename Stored2,typename Less = std::less<T>>
+        bool lexographical_compare(const base_sequence<T2,Derived2,Stored2> & other, Less lt = {}) const
         {
             auto i1 = self().first();
             auto i2 = other.self().first();
@@ -190,12 +190,17 @@ namespace sequences
             return select([](const T&t) { return U{t}; });
         }
 
+        typedef Derived stored_type;
+
         // ?? Operator virtual_sequence?
     };
+
+    template<typename T>
+    class sequence_ref;
 }
 
 template<typename T>
-class sequence : public sequences::base_sequence<T, sequence<T>>
+class sequence : public sequences::base_sequence<T, sequence<T>, sequences::sequence_ref<T>>
 {
 public:
     typedef T value_type;
@@ -211,13 +216,24 @@ namespace sequences
         Seq seq;
     public:
         virtual_sequence(Seq seq) : seq(seq) {}
+        typedef virtual_sequence<T, Seq> stored_type;
 
         const T * first() override { return seq.first(); }
         const T * next() override { return seq.next(); }
     };
 
     template<typename T>
-    class empty_sequence : public base_sequence<T, empty_sequence<T>>
+    class sequence_ref : public sequence<T>
+    {
+        sequence<T> & seq;
+    public:
+        sequence_ref(sequence<T> &ref) : seq(ref) {}
+        const T * first() override { return seq.first(); }
+        const T * next() override { return seq.next(); }
+    };
+
+    template<typename T>
+    class empty_sequence : public base_sequence<T, empty_sequence<T>, empty_sequence<T>>
     {
     public:
         typedef T value_type;
@@ -226,7 +242,7 @@ namespace sequences
     };
 
     template<typename T>
-    class singleton_sequence : public base_sequence<T, singleton_sequence<T>>
+    class singleton_sequence : public base_sequence<T, singleton_sequence<T>, singleton_sequence<T>>
     {
         const T value;
     public:
@@ -237,7 +253,7 @@ namespace sequences
     };
 
     template<typename It>
-    class iterator_sequence : public base_sequence<typename std::iterator_traits<It>::value_type, iterator_sequence<It>>
+    class iterator_sequence : public base_sequence<typename std::iterator_traits<It>::value_type, iterator_sequence<It>, iterator_sequence<It>>
     {
         It from, to, current;
     public:

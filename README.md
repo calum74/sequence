@@ -1,17 +1,17 @@
-# sequence
+# Sequence
 
-Universal sequences in C++.
+Universal sequences in C++
 
 ## Overview
 
-/Sequence/ provides a simple, efficient and uniform way to create, pass and manipulate sequences in C++. It aims to do two things:
+_Sequence_ provides a simple, efficient and uniform way to create, pass and manipulate sequences in C++. It aims to do two things:
 
 - Provide a lightweight abstraction for creating and passing sequences
-- Provides a LINQ-style interface for transforming and manipulating sequences
+- Provide a LINQ-style interface for transforming and manipulating sequences
 
 It was born out of the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, and they all have their drawbacks.
 
-To solve this, we introduce a universal type, `sequence<T>` that represents any type of sequence of type `T`. `sequence<T>` unifies the plethora of abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates.
+To solve this, we introduce a universal type, `sequence<T>` that represents any sequence of type `T`. `sequence<T>` unifies the plethora of abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates.
 
 As a motivating example, consider an `init()` function to initialize some code using a list of options. It could be defined in any number of ways such as
 
@@ -25,7 +25,7 @@ As a motivating example, consider an `init()` function to initialize some code u
 ```
 The most generic approach, using a pair of iterators, is unfortunately the fiddliest. Not everyone enjoys programming with templates, and it requires the function is implemented in a header file.
 
-/Sequence/ replaces all of these unsatisfactory options with a much simpler
+_Sequence_ replaces all of these unsatisfactory options with a much simpler
 
 ```c++
     void init(const sequence<const char*> & items);
@@ -103,17 +103,17 @@ There's not really a convenient way to represent a stream in C++, so we'd probab
 
 ```c++
     auto primes = seq(2,1000).where([](int n) {
-        for(int m : seq(2,n-1))
-            if (n%m==0) return false;
-        return true;
-    });
+            for(int m : seq(2,n-1))
+                if (n%m==0) return false;
+            return true;
+        });
 ```
 
 I think this is a little better. Not only is the code shorter, but the values are computed lazily and there is no need to store the results in a temporary vector.
 
 ## Installation
 
-/Sequence/ is a header-only C++ library, so it can just be copied into your project, or installed via a submodule. For example
+_Sequence_ is a header-only C++ library, so it can just be copied into your project, or installed via a submodule. For example
 
 ```bash
 git submodule add https://github.com/calum74/sequence.git
@@ -231,11 +231,11 @@ Remember to configure our project for a release build (`cmake -DCMAKE_BUILD_TYPE
 Sample output
 
 ```
-Version 1: 112.628 ms
-Version 2: 347.1 ms
+Regular C code: 112.628 ms
+Sequence: 347.1 ms
 ```
 
-Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235ns on my CPU. The explanation I can think of is that the compiler just did a better job on the C code.
+Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235ns on my CPU. The only explanation I can think of is that the compiler just did a better job on the C code.
 
 ## Thread safety
 

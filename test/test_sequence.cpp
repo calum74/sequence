@@ -13,9 +13,18 @@ void test_eq(const sequence<int> & s1, const sequence<int> &s2)
     assert(s1==s2);
 }
 
-void init(const sequence<std::string> & params)
-{
+void handleOption(const char *opt) {
+    std::cout << "Option is " << opt << std::endl;
+}
 
+void init(const sequence<const char *> & params)
+{
+    for(auto p : params.where([](const char * str) { return str[0]=='-'; }))
+        handleOption(p+1);
+
+    for(auto p : params.where([](const char * str) { return str[0]=='-'; }).
+        select([](const char * q) { return q+1; }))
+            handleOption(p);
 }
 
 const int N=1000000000;
@@ -113,8 +122,8 @@ int main()
 
     test_eq(list(1,2,3), list(1,2,3));
 
-    init(list<std::string>("a", "b", "c"));
-    init(list("a","b","c").as<std::string>());
+    init(list("-a", "-b", "-c"));
+    init(list("a","b","c"));
 
     auto primes = seq(2,1000).where([](int n) {
         for(int m : seq(2,n-1))

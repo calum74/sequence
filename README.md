@@ -1,37 +1,47 @@
 # sequence
 
-Universal sequences for C++.
+Universal sequences in C++.
 
 ## Overview
 
-This project solves a few annoyances regarding collections in C++:
+/Sequence/ provides a simple, efficient and uniform way to create, pass and manipulate sequences in C++. It aims to do two things:
 
-1. There are multiple and incompatible ways to specify collections of things in C++.
-2. To make code generic you need to implement your code as templates in header files, which is just annoying.
-3. Implement LINQ-style queries for efficient and concise code.
-4. No simple numerical ranges
+- Provide a lightweight abstraction for creating and passing sequences
+- Provides a LINQ-style interface for transforming and manipulating sequences
 
-To solve this, we introduce a universal type, `sequence<T>` that represents any type of sequence. `sequence` unifies the plethora of abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates.
+It was born out of the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, and they all have their drawbacks.
 
-Use cases for this are:
+To solve this, we introduce a universal type, `sequence<T>` that represents any type of sequence of type `T`. `sequence<T>` unifies the plethora of abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates.
 
-1. Any function that needs to be passed a list of some kind. `sequence` provides an efficient and universal abstraction that allows such a function to be implemented without needing templates or pointers.
-2. To simplify code that needs to perform sequence operations.
-
-A simple example of a function accepting a sequence of strings is:
+As a motivating example, consider an `init()` function to initialize some code using a list of options. It could be defined in any number of ways such as
 
 ```c++
-    // Regular C++:
     void init(const std::initializer_list<const char*> & items);
-    init({"foo.c", "bar.c"});  // Ok, but what if we want to switch to argv/argc?
+    template<typename It> void init(It a, It b);
+    void init(const char **a, const char**b);
+    void init(const char**items, int length);
+    void init(int length, const char*items ...);
+    void init(const std::vector<const char*> & items);
+```
+The most generic approach, using a pair of iterators, is unfortunately the fiddliest. Not everyone enjoys programming with templates, and it requires the function is implemented in a header file.
 
-    // Using sequences:
-    void init(const std::sequence<const char*> & params);
-    init(list("foo.c", "bar.c"));   // Constructs a list
-    init(seq(argv, argc));          // This just works -- TODO: Test
+/Sequence/ replaces all of these unsatisfactory options with a much simpler
+
+```c++
+    void init(const sequence<const char*> & items);
 ```
 
-Here we see the problem that we can't easily switch the signature of `init()` to accept a different type of array.
+that can be implemented in a `.cpp` file. We can they create a sequence (which is a thin wrapper) using `seq` and `list`, and pass it to `init()` in a uniform way.
+
+```c++
+    const char * items[] = { "foo.c", "bar.c" };
+    std::vector<std::string> vec;
+
+    init(list("foo.c", "bar.c"));
+    init(seq(argv, argc));
+    init(seq(items));
+    init(seq(vec));
+```
 
 The next example shows the list processing of options, where we want to call `handleOption()` for every string beginning with `-`.
 
@@ -61,12 +71,6 @@ The `sequence` version is actually a little longer, but mainly because we didn't
 
 This next example counts the number of spaces in a string using regular C++.
 ```c++
-    // Method 1
-    int count=0;
-    for(auto ch : std::string("The quick brown fox"))
-        if(ch==' ') count++;
-
-    // Method 2
     int count=0;
     for(const char * ch = "The quick brown fox"; *ch; ++ch)
         if(ch==' ') count++;
@@ -76,18 +80,6 @@ Using sequences, we can use the `count()` method, specifying a predicate.
 
 ```c++
     auto count = seq("The quick brown fox").count([](char x) { return x==' '; });
-```
-
-This example shows a rather simple loop:
-
-```c++
-    for(int i=1; i<=12; i++)
-```
-
-We can do the same using a sequence.
-
-```c++
-    for(int i : seq(1,12))
 ```
 
 As a final example of list manipulation, here's a sequence of prime numbers up to one thousand. Firstly using regular C++
@@ -117,19 +109,133 @@ There's not really a convenient way to represent a stream in C++, so we'd probab
     });
 ```
 
-I think this is a little better. Not only is the code shorter, but the values are computed lazily and there is no need to store the results in a vector.
+I think this is a little better. Not only is the code shorter, but the values are computed lazily and there is no need to store the results in a temporary vector.
 
 ## Installation
 
 /Sequence/ is a header-only C++ library, so it can just be copied into your project, or installed via a submodule. For example
 
 ```bash
-$ git submodule add ...
+git submodule add https://github.com/calum74/sequence.git
 ```
+
+The header files are in the `include` directory.
 
 ## Tests
 
+You can build and run the tests in the `tests` directory using CMake.
+
+```bash
+cd sequence
+mkdir build
+cd build
+cmake ../tests
+make all test
+```
+
 ## Benchmarks
+
+Remember to configure our project for a release build (`cmake -DCMAKE_BUILD_TYPE=Release`) for this.
+
+```c++
+    const int N=1000000000;
+
+    int sum=0;
+    for(int i=0; i<=N; i++)
+        if(i%2==0)
+            sum += i*i;
+```
+
+<details>
+<summary>Click here for disassembly
+</summary>
+
+```
+0000000100001d58 <__Z13do_benchmark1v>:
+100001d58: 00 e4 00 6f 	movi.2d	v0, #0000000000000000
+100001d5c: 81 04 00 4f 	movi.4s	v1, #4
+100001d60: 1f 20 03 d5 	nop
+100001d64: 62 e0 00 9c 	ldr	q2, 0x100003970 <_strlen+0x100003970>
+100001d68: 03 05 00 4f 	movi.4s	v3, #8
+100001d6c: 08 40 99 52 	mov	w8, #51712
+100001d70: 48 73 a7 72 	movk	w8, #15258, lsl #16
+100001d74: 84 05 00 4f 	movi.4s	v4, #12
+100001d78: 25 04 00 4f 	movi.4s	v5, #1
+100001d7c: 06 06 00 4f 	movi.4s	v6, #16
+100001d80: 07 e4 00 6f 	movi.2d	v7, #0000000000000000
+100001d84: 10 e4 00 6f 	movi.2d	v16, #0000000000000000
+100001d88: 11 e4 00 6f 	movi.2d	v17, #0000000000000000
+100001d8c: 52 84 a1 4e 	add.4s	v18, v2, v1
+100001d90: 53 84 a3 4e 	add.4s	v19, v2, v3
+100001d94: 54 84 a4 4e 	add.4s	v20, v2, v4
+100001d98: 55 1c 25 4e 	and.16b	v21, v2, v5
+100001d9c: b5 9a a0 4e 	cmeq.4s	v21, v21, #0
+100001da0: 56 9c a2 4e 	mul.4s	v22, v2, v2
+100001da4: 52 9e b2 4e 	mul.4s	v18, v18, v18
+100001da8: 73 9e b3 4e 	mul.4s	v19, v19, v19
+100001dac: 94 9e b4 4e 	mul.4s	v20, v20, v20
+100001db0: d6 1e 35 4e 	and.16b	v22, v22, v21
+100001db4: 52 1e 35 4e 	and.16b	v18, v18, v21
+100001db8: 73 1e 35 4e 	and.16b	v19, v19, v21
+100001dbc: 94 1e 35 4e 	and.16b	v20, v20, v21
+100001dc0: c0 86 a0 4e 	add.4s	v0, v22, v0
+100001dc4: 47 86 a7 4e 	add.4s	v7, v18, v7
+100001dc8: 70 86 b0 4e 	add.4s	v16, v19, v16
+100001dcc: 91 86 b1 4e 	add.4s	v17, v20, v17
+100001dd0: 42 84 a6 4e 	add.4s	v2, v2, v6
+100001dd4: 08 41 00 71 	subs	w8, w8, #16
+100001dd8: a1 fd ff 54 	b.ne	0x100001d8c <__Z13do_benchmark1v+0x34>
+100001ddc: e0 84 a0 4e 	add.4s	v0, v7, v0
+100001de0: 00 86 a0 4e 	add.4s	v0, v16, v0
+100001de4: 20 86 a0 4e 	add.4s	v0, v17, v0
+100001de8: 00 b8 b1 4e 	addv.4s	s0, v0
+100001dec: 08 00 26 1e 	fmov	w8, s0
+100001df0: 89 ec b4 52 	mov	w9, #-1486618624
+100001df4: 00 01 09 0b 	add	w0, w8, w9
+100001df8: c0 03 5f d6 	ret
+```
+</details>
+
+```c++
+    int sum = seq(0, N).
+        where([](int n) { return n%2==0; }).
+        select([](int n) { return n*n; }).sum();
+```
+
+<details>
+<summary>Click here for disassembly
+</summary>
+
+```
+0000000100001f94 <__Z13do_benchmark2v>:
+100001f94: 0b 00 80 52 	mov	w11, #0
+100001f98: 09 00 80 52 	mov	w9, #0
+100001f9c: 00 00 80 52 	mov	w0, #0
+100001fa0: 28 40 99 52 	mov	w8, #51713
+100001fa4: 48 73 a7 72 	movk	w8, #15258, lsl #16
+100001fa8: 03 00 00 14 	b	0x100001fb4 <__Z13do_benchmark2v+0x20>
+100001fac: 4b 7d 0a 1b 	mul	w11, w10, w10
+100001fb0: e9 03 0a aa 	mov	x9, x10
+100001fb4: 00 00 0b 0b 	add	w0, w0, w11
+100001fb8: 2a 05 00 11 	add	w10, w9, #1
+100001fbc: 5f 01 08 6b 	cmp	w10, w8
+100001fc0: a0 00 00 54 	b.eq	0x100001fd4 <__Z13do_benchmark2v+0x40>
+100001fc4: 4a ff 07 36 	tbz	w10, #0, 0x100001fac <__Z13do_benchmark2v+0x18>
+100001fc8: 2a 09 00 11 	add	w10, w9, #2
+100001fcc: 5f 01 08 6b 	cmp	w10, w8
+100001fd0: e1 fe ff 54 	b.ne	0x100001fac <__Z13do_benchmark2v+0x18>
+100001fd4: c0 03 5f d6 	ret
+```
+</details>
+
+Sample output
+
+```
+Version 1: 112.628 ms
+Version 2: 347.1 ms
+```
+
+Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235 ns on my CPU. The explanation I can think of is that the compiler just did a better job on the C code.
 
 ## Thread safety
 

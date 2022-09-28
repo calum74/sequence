@@ -7,7 +7,12 @@ namespace sequences
         typedef typename Container::value_type value_type;
         typename Container::const_iterator current;
     public:
-        stored_sequence(const Container & c) : container(c) {}
+        stored_sequence(Container && c) : container(std::move(c)) {}
+
+        // Efficiency warning
+        stored_sequence(const stored_sequence & other) = delete;
+
+        operator iterator_sequence<typename Container::const_iterator>() { return {container.begin(), container.end()}; }
 
         const value_type * first()
         {
@@ -20,5 +25,7 @@ namespace sequences
             ++current;
             return current == container.end() ? nullptr : &*current;
         }
+
+        std::size_t size() const { return container.size(); }
     };
 }

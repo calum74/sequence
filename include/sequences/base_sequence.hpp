@@ -93,14 +93,14 @@ namespace sequences
         }
 
         // TODO: Rename this
-        const value_type &first2() const
+        const value_type &front() const
         {
             auto c = self().first();
             if(!c) throw std::out_of_range("first() called on an empty list");
             return *c;
         }
 
-        const value_type &last() const
+        const value_type &back() const
         {
             for(auto c = self().first(); c;)
             {

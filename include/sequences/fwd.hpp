@@ -22,4 +22,10 @@ namespace sequences
 
     template<typename T>
     class sequence_ref;
+
+    template<typename T>
+    class empty_sequence;
+
+    template<typename T>
+    class singleton_sequence;
 }

@@ -7,6 +7,6 @@ namespace sequences
         typedef T value_type;
         const value_type * first() { return nullptr; }
         const value_type * next() { return nullptr; }
-        std::size_t size() const { return 1; }
+        std::size_t size() const { return 0; }
     };
 }

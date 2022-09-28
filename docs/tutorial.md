@@ -31,13 +31,13 @@ The `seq()` function is used to create sequences for a variety of situations. It
 
 Since the underlying collection could be a temporary object itself, care must be taken to avoid problems like dangling references or invalid iterators.
 
-Lists are created using the `list()` function.  A list is just another type of sequence
-
 ```c++
     std::vector<std::string> params;
 
     init(seq(params));
 ```
+
+Lists are created using the `list()` function.  A list is just another type of sequence
 
 Examples:
 
@@ -50,7 +50,7 @@ Other sequence can be created by transforming an existing sequence, using the va
 
 * `take`, `skip`, `where`, `select`, `take_until`, `as`
 
-## Using sequences
+## Using sequences as containers
 
 Sequences are used mostly like normal C++ containers, so can for example just be iterated:
 
@@ -59,13 +59,62 @@ Sequences are used mostly like normal C++ containers, so can for example just be
         ...
 ```
 
-You can find the size of a list using the `size()` method - beware that this can be an O(n) operation.
+The normal container functions are supported: `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()`
 
-## Passing sequences
+The performance characteristics of these functions is O(1) with the exceptions:
+
+* `size()` is O(1) or O(n)
+* `back()` is O(n)
+* `at(n)` is O(`n`)
+
+Sequences are not modifyable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Adapting sequences] on how to do this.
+
+Sequences can only be iterated in the forwards direction, so `rbegin()` and `rend()` are not supported.
+
+## Operations
+
+`bool any()`, `bool any(Pred p)`
+This is more efficient than `size()>0` because it only needs to check the first item.
+
+
+aggregate
+sum
+
+Example: hashing a sequence
+
+```c++
+    int hash = s.aggregate([](int n1, int n2) { return n1*13 + n2; })
+```
+
+
+## Comparing sequences
+
+Sequences support the normal comparison operators, `==`, `!=`, `<`, `>`, `<=`, `>=`. These perform memberwise equality and lexographical comparison. A comparator can be passed to the `equals` and `lexographical_compare` methods in case the default operator == and < are not correct.
+
+Example:
+
+```c++
+    assert(seq(1,3)==list(1,2,3));
+```
+
+## Managing sequences
+
+Sequences are not really designed to be stored long term. Rather they are flyweight objects that wrap and transform existing data. Beware that sequences are often constructed from iterators, so beware of any sequence that references an existing object, or a temporary object.
+
+The following code does not compile
+
+```c++
+    std::string get_name();
+
+    seq(get_name()).size();  // Do not do this
+```
+
+
+A common
 
 Object lifetime
 
 Thread safety
 
 
-## Manipulating sequences
+## Adapting sequences

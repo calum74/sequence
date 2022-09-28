@@ -1,5 +1,5 @@
 namespace sequences
-{
+{    
     template<typename T, int Size>
     class stored_array_sequence : public base_sequence<T, stored_array_sequence<T, Size>>
     {
@@ -7,7 +7,13 @@ namespace sequences
         T items[Size];
     public:
 
+        // ~stored_array_sequence() { std::cout << "Destroyed sas\n"; }
+
         typedef T value_type;
+
+        // pointer_sequence<T> as_ptr() const { return {items,items+Size}; }
+
+        // operator pointer_sequence<T>() const { return {items,items+Size}; }
 
         stored_array_sequence(const T(&input)[Size])
         {

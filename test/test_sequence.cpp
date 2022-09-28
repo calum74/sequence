@@ -3,6 +3,7 @@
 
 // This is the main header file to include, which includes everything
 // You can also #include <sequence_fwd.hpp> if you just need the forward declaration.
+
 #include <sequence.hpp>
 
 #include <iostream>
@@ -71,8 +72,52 @@ void benchmark2()
     std::cout << sum << " completed in " << std::chrono::duration<double, std::milli>(t2-t1).count() << " ms" << std::endl;
 }
 
+class Element
+{
+    bool constructed;
+
+public:
+    Element() : constructed(true) {}
+    ~Element() { constructed = false; assert(!valid()); }
+
+    bool valid() const { return constructed; }
+};
+
+std::vector<Element> getVector()
+{
+    return std::vector<Element>{ 4 };
+}
+
+void testVector(const sequence<Element> & elements)
+{
+    assert(elements.size()==4);
+    for(auto & i : elements)
+        assert(i.valid());
+}
+
+void testVector2(const pointer_sequence<Element> & elements)
+{
+    assert(elements.size()==4);
+    for(auto & i : elements)
+        assert(i.valid());
+}
+
+
+void test_lifetimes()
+{
+    testVector(seq(getVector()));
+    testVector(list(Element(), Element(), Element(), Element()));
+
+    testVector2(seq(getVector()));
+    testVector2(list(Element(), Element(), Element(), Element()));
+
+    testVector(seq({Element(), Element(), Element(), Element()}));
+
+}
+
 int main()
 {
+    test_lifetimes();
     assert(seq(1,10).size()==10);
     assert(seq(1,10).where([](int x) { return x>4;}).size() == 6);
     assert(seq(1,10).select(
@@ -121,8 +166,8 @@ int main()
     assert(list(1,2,3).sum() == 6);
     assert(list(1,2,3).select([](int x) { return x*2+1; }).sum() == 15);
 
-    assert(list(1,2,3).first2()==1);
-    assert(list(1,2,3).last()==3);
+    assert(list(1,2,3).front()==1);
+    assert(list(1,2,3).back()==3);
     assert(list(2,3,4).at(1)==3);
     assert(list(2,3,4).at(0)==2);
     assert(list(2,3,4).at(2)==4);
@@ -165,6 +210,10 @@ int main()
     }
 
     assert(seq(primes2) == primes);
+
+    // This should work!
+    assert(seq(std::string("hello")).size()==5);
+    assert(seq((const std::string&)std::string("hello")).size()==5);
 
     std::cout << "Running benchmarks...\n";
     benchmark1();

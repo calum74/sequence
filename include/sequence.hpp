@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "sequence_fwd.hpp"
 #include "sequences/fwd.hpp"
 #include "sequences/base_sequence.hpp"
 #include "sequences/sequence.hpp"
@@ -18,6 +19,7 @@
 #include "sequences/stored_array_sequence.hpp"
 #include "sequences/pointer_sequence.hpp"
 #include "sequences/take_sequence.hpp"
+#include "sequences/stored_sequence.hpp"
 
 template<typename Container>
 sequences::iterator_sequence<typename Container::const_iterator> seq(const Container &c)
@@ -26,13 +28,13 @@ sequences::iterator_sequence<typename Container::const_iterator> seq(const Conta
 }
 
 template<typename T, int Size>
-sequences::iterator_sequence<T*> seq(const T (&items)[Size])
+pointer_sequence<T> seq(const T (&items)[Size])
 {
     return {items, items+Size};
 }
 
-template<typename T>
-void seq(const std::initializer_list<T> & list) {}
+//template<typename T>
+//void seq(const std::initializer_list<T> & list) = delete;
 // Error - use list instead
 
 template<typename T, typename...Ts>
@@ -91,7 +93,7 @@ pointer_sequence<Ch> seq(const std::basic_string<Ch> & str) {
 }
 
 template<typename T, typename Alloc>
-inline pointer_sequence<T> seq(const std::vector<T, Alloc> & vec)
+pointer_sequence<T> seq(const std::vector<T, Alloc> & vec)
 {
     return { vec.data(), vec.data()+vec.size() };
 }

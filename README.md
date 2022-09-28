@@ -7,7 +7,7 @@ Universal sequences in C++
 _Sequence_ provides a simple, efficient and uniform way to create, pass and manipulate sequences in C++. It aims to do two things:
 
 - Provide a lightweight abstraction for creating and passing sequences
-- Provide a LINQ-style interface for transforming and manipulating sequences
+- Provide a [LINQ](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/)-style library for transforming and manipulating sequences
 
 It was born out of the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, and they all have their drawbacks.
 
@@ -23,15 +23,15 @@ As a motivating example, consider an `init()` function to initialize some code u
     void init(int length, const char*items ...);
     void init(const std::vector<const char*> & items);
 ```
-The most generic approach, using a pair of iterators, is unfortunately the fiddliest. Not everyone enjoys programming with templates, and it requires the function is implemented in a header file.
+The only generic approach, using a pair of iterators, unfortunately requires a template implemented in a header file.
 
-_Sequence_ replaces all of these unsatisfactory options with a much simpler
+_Sequence_ replaces all of these unsatisfactory options with the much simpler
 
 ```c++
     void init(const sequence<const char*> & items);
 ```
 
-that can be implemented in a `.cpp` file. We can they create a sequence (which is a thin wrapper) using `seq` and `list`, and pass it to `init()` in a uniform way.
+that can be implemented in a `.cpp` file. We can then create a sequence (which is a thin wrapper) using the `seq()` and `list()` functions, and pass it to `init()` in a uniform way.
 
 ```c++
     const char * items[] = { "foo.c", "bar.c" };
@@ -42,6 +42,14 @@ that can be implemented in a `.cpp` file. We can they create a sequence (which i
     init(seq(items));
     init(seq(vec));
 ```
+
+We can create "computed sequences", for example
+
+```c++
+    init(seq(argv, argc).take_until([](const char * str) { return strcmp(str, "--")==0; }));
+```
+
+passes in only the parameters before the `--` parameter.
 
 The next example shows the list processing of options, where we want to call `handleOption()` for every string beginning with `-`.
 
@@ -56,18 +64,21 @@ In regular C++, we would probably just loop over the array as follows:
     }
 ```
 
-Using sequences, we can instead use `where`, `select` and `foreach` to processes the sequence using lambdas.
+Using sequences, we can instead use `where` and `select` to processes the sequence using lambdas.
 
 ```c++
     void init(const std::sequence<const char*> & params)
     {
-        params.where([](const char * str) { return str[0]=='-'; }).
-            select([](const char * str) { return str+1; }).
-            foreach([](const char * option) { handleOption(option); });
+        auto options = params.
+            where ([](const char * arg) { return arg[0]=='-'; }).
+            select([](const char * arg) { return arg+1; });
+
+        for(auto p : options)
+            handleOption(p);
     }
 ```
 
-The `sequence` version is actually a little longer, but mainly because we didn't fold `select` and `foreach` into one line. Sequences are I think a little safer and more high level. 
+Granted, the `sequence` version is actually a little longer, but I think sequences are a little safer and more high level. 
 
 This next example counts the number of spaces in a string using regular C++.
 ```c++
@@ -82,7 +93,7 @@ Using sequences, we can use the `count()` method, specifying a predicate.
     auto count = seq("The quick brown fox").count([](char x) { return x==' '; });
 ```
 
-As a final example of list manipulation, here's a sequence of prime numbers up to one thousand. Firstly using regular C++
+As a final example of list manipulation, here's a sequence of prime numbers up to one thousand. Firstly using regular C++,
 
 ```c++
     std::vector<int> primes;
@@ -103,13 +114,11 @@ There's not really a convenient way to represent a stream in C++, so we'd probab
 
 ```c++
     auto primes = seq(2,1000).where([](int n) {
-            for(int m : seq(2,n-1))
-                if (n%m==0) return false;
-            return true;
-        });
+        return !seq(2,n-1).any([=](int m) { return n%m==0; });
+    });
 ```
 
-I think this is a little better. Not only is the code shorter, but the values are computed lazily and there is no need to store the results in a temporary vector.
+I think this is better. Not only is the code shorter, but the values are computed lazily and there is no need to store the results in a temporary vector.
 
 ## Installation
 
@@ -126,16 +135,23 @@ The header files are in the `include` directory.
 You can build and run the tests in the `tests` directory using CMake.
 
 ```bash
+git clone https://github.com/calum74/sequence.git
 cd sequence
 mkdir build
 cd build
-cmake ../tests
+cmake ..
 make all test
 ```
 
+# Performance
+
+_Sequence_ is a minimal-overhead library that does not use any containers or heap allocation under the hood.
+
+There is once case where _Sequence_ is a bit more expensive, which is when passing arguments using `const sequence<T>&`. In this case, there is an additional overhead of one virtual function call per item in the sequence. If that is a problem, you can use a `pointer_sequence` instead which does not use virtual functions.
+
 ## Benchmarks
 
-Remember to configure our project for a release build (`cmake -DCMAKE_BUILD_TYPE=Release`) for this.
+Remember to configure our project for a release build (`cmake .. -DCMAKE_BUILD_TYPE=Release`) for this.
 
 ```c++
     const int N=1000000000;
@@ -236,45 +252,4 @@ Sequence: 347.1 ms
 ```
 
 Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235ns on my CPU. The only explanation I can think of is that the compiler just did a better job on the C code.
-
-## Thread safety
-
-# Manual
-
-## Header file
-
-```c++
-#include <sequence.hpp>
-```
-
-## Namespace
-
-sequence is not in a namespace.
-
-## Types
-
-The library defines just one (abstract) type:
-
-```
-template<typename T> class sequence;
-```
-
-There are also various unspecified types that inherit from `sequence<T>`. These should be named anonymously (via `auto`) or by reference to `sequence<T>`.
-
-For example
-
-```c++
-void init(const sequence<std::string> & params);
-```
-
-## Construction
-
-
-
-
-## `class sequence<T>`
-
-Containers, iterators, thread safety
-
-## Implementing new sequences
 

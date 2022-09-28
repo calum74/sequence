@@ -1,8 +1,14 @@
-#include "sequence.hpp"
+// This file forms the test suite for the Sequence library
+// It also contains lots of examples used throughout the documentation.
+
+// This is the main header file to include, which includes everything
+// You can also #include <sequence_fwd.hpp> if you just need the forward declaration.
+#include <sequence.hpp>
 
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <map>
 
 #undef NDEBUG
 #include <cassert>
@@ -17,14 +23,18 @@ void handleOption(const char *opt) {
     std::cout << "Option is " << opt << std::endl;
 }
 
-void init(const sequence<const char *> & params)
+// An example of a function that takes a sequence
+void init(const pointer_sequence<const char *> & params)
 {
     for(auto p : params.where([](const char * str) { return str[0]=='-'; }))
         handleOption(p+1);
 
-    for(auto p : params.where([](const char * str) { return str[0]=='-'; }).
-        select([](const char * q) { return q+1; }))
-            handleOption(p);
+    auto options = params.
+        where ([](const char * arg) { return arg[0]=='-'; }).
+        select([](const char * arg) { return arg+1; });
+
+    for(auto p : options)
+        handleOption(p);
 }
 
 const int N=1000000000;
@@ -126,10 +136,16 @@ int main()
     init(list("a","b","c"));
 
     auto primes = seq(2,1000).where([](int n) {
-        for(int m : seq(2,n-1))
-            if (n%m==0) return false;
-        return true;
+        return !seq(2,n-1).any([=](int m) { return n%m==0; });
     });
+
+    // Example: iterate the keys or values in a map
+
+    std::map<std::string, int> map1;
+    assert(primes.any());
+
+    // auto primes3 = seq(2,1000).where([=](int n) {
+    //    return !primes3.take_while([=](int m) { return n<m; }).any([](int p) { return n%p==0; });
 
     for(auto p : primes)
         std::cout << p << " ";

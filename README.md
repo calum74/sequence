@@ -6,10 +6,10 @@ Universal sequences in C++
 
 _Sequence_ provides a simple, efficient and uniform way to create, pass and manipulate sequences in C++. It aims to do two things:
 
-- Provide a lightweight abstraction for creating and passing sequences
+- Provide a unified & lightweight abstraction for creating and passing sequences
 - Provide a [LINQ](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/)-style library for transforming and manipulating sequences
 
-It was born out of the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, and they all have their drawbacks.
+It was motivated by the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, and they all have their drawbacks.
 
 To solve this, we introduce a universal type, `sequence<T>` that represents any sequence of type `T`. `sequence<T>` unifies the plethora of abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates.
 
@@ -93,7 +93,7 @@ Using sequences, we can use the `count()` method, specifying a predicate.
     auto count = seq("The quick brown fox").count([](char x) { return x==' '; });
 ```
 
-As a final example of list manipulation, here's a sequence of prime numbers up to one thousand. Firstly using regular C++,
+As a final example, here's a sequence of prime numbers up to one thousand. Firstly using regular C++,
 
 ```c++
     std::vector<int> primes;
@@ -145,9 +145,9 @@ make all test
 
 # Performance
 
-_Sequence_ is a minimal-overhead library that does not use any containers or heap allocation under the hood.
+_Sequence_ is a minimal-overhead library that does not use any containers or heap allocation internally.
 
-There is once case where _Sequence_ is a bit more expensive, which is when passing arguments using `const sequence<T>&`. In this case, there is an additional overhead of one virtual function call per item in the sequence. If that is a problem, you can use a `pointer_sequence` instead which does not use virtual functions.
+There is once case where _Sequence_ is a bit more expensive, which is when passing arguments using `const sequence<T>&`. In this case, there is an additional overhead of one virtual function call per item in the sequence. If that is a problem, you can use the even more lightweight `pointer_sequence` instead which does not use virtual functions, but is limited to cases where the data is stored in an underlying array.
 
 ## Benchmarks
 
@@ -246,10 +246,7 @@ Remember to configure our project for a release build (`cmake .. -DCMAKE_BUILD_T
 
 Sample output
 
-```
-Regular C code: 112.628 ms
-Sequence: 347.1 ms
-```
+* Regular C code: 112.628 ms
+* Sequence: 347.1 ms
 
-Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop, and the overhead per iteration is 235ns on my CPU. The only explanation I can think of is that the compiler just did a better job on the C code.
-
+Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop. The only explanation I can think of is that the compiler just did a better job on the C code. The code generated for `sequence` is actually excellent.

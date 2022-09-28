@@ -62,10 +62,12 @@ namespace detail
         typedef int difference_type;
         typedef int * pointer;
         typedef int & reference;
-        typedef std::forward_iterator_tag iterator_category;
+        typedef std::random_access_iterator_tag iterator_category;
         const int &operator*() const { return value; }
         int_iterator & operator++() { ++value; return *this; }
         bool operator!=(const int_iterator & other) const { return value != other.value; }
+
+        int operator-(int_iterator other) const { return value - other.value; }
     };
 }
 
@@ -77,8 +79,6 @@ inline sequences::iterator_sequence<detail::int_iterator> seq(int a, int b)
 inline pointer_sequence<char> seq(const char * cstr) {
     return {cstr, cstr+strlen(cstr) };
 }
-
-// TODO: Pointer sequence for string and vector
 
 template<typename T>
 pointer_sequence<T> seq(T * ptr, int size) {

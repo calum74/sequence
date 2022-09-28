@@ -39,5 +39,7 @@ namespace sequences
                 return nullptr;
             }
         }
+
+        std::size_t size() const { return seq.size(); }
     };
 }

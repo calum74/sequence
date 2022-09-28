@@ -9,5 +9,6 @@ namespace sequences
         singleton_sequence(const T & v) : value(v) {}
         const value_type * first() { return &value; }
         const value_type * next() { return nullptr; }
+        std::size_t size() const { return 1; }
     };
 }

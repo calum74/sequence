@@ -18,6 +18,8 @@ namespace sequences
         {
             ++current;
             return current!=to ? &*current : nullptr;
-        }        
+        }
+
+        std::size_t size() const { return std::distance(from, to); }
     };
 }

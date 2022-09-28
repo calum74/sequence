@@ -19,4 +19,6 @@ public:
     {
         return ++current==b ? nullptr : current;
     }
+
+    std::size_t size() const { return b-a; }
 };

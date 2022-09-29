@@ -8,5 +8,6 @@ namespace sequences
         sequence_ref(sequence<T> &ref) : seq(ref) {}
         const T * first() override { return seq.first(); }
         const T * next() override { return seq.next(); }
+        std::size_t size() const override { return seq.size(); }
     };
 }

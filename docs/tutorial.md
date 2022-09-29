@@ -5,13 +5,14 @@
 _Sequence_ is a C++ library for universal sequences. This has two main uses:
 
 - Making it easier to pass lists into functions using a lightweight wrapper,
-- Making it easier to manipulate and transform sequences without sacrificing performance.
+- Making it easier to manipulate and transform sequences without sacrificing performance,
+- Make it easier to return and visit sequences.
 
 Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1) of course.
 
 ## What is a sequence?
 
-A _sequence_ is defined as zero or elements of the same type. A sequence can even be infinite. Sequences can be used in any situation where a list or collection is required, and replaces the various alternatives in C++ with something simpler and more powerful.
+A _sequence_ is defined as a set of ordered elements of the same type. A sequence can even be infinite. Sequences can be used in any situation where a list or collection is required, and replaces the various alternatives in C++ with something simpler and more powerful.
 
 Sequences can only be iterated in the forwards direction. They are C++ sequential containers, with an input iterator type.
 
@@ -23,7 +24,7 @@ Sequences are generally evaluated lazily, meaning that elements are processed on
     int count = seq(1,1000000000).where([](int n) { return n%2==0; }).size();
 ```
 <details>
-<summary>Click here for arm64 disassembly
+<summary>Expand for arm64 disassembly
 </summary>
 
 ```
@@ -50,7 +51,7 @@ Sequences are generally evaluated lazily, meaning that elements are processed on
 
 ## Creating sequences
 
-The `seq()` function is used to create sequences for a variety of situations. It returns a lightweight wrapper that constructs and returns an appropriate sequence object.
+The `seq()` function is used to create sequences for a variety of situations. It returns a lightweight wrapper for an appropriate sequence object.
 
 1. `seq<T>()` called with no arguments returns an empty sequence. In this case, you need to specify the type `T` of the sequence.
 
@@ -62,7 +63,7 @@ The `seq()` function is used to create sequences for a variety of situations. It
 
 5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range a-b.
 
-The return type of `seq(...)` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &`.
+The return type of `seq( )` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &`.
 
 As a simple example, this `seq()` function wraps a `vector` to create a sequence:
 
@@ -104,7 +105,7 @@ The performance characteristics of these functions is O(1) with the exceptions:
 * `back()` is O(n)
 * `at(n)` is O(`n`)
 
-Sequences are not modifyable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Adapting sequences] on how to do this.
+Sequences are not modifiable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Adapting sequences] on how to do this.
 
 Sequences can only be iterated in the forwards direction, so `rbegin()` and `rend()` are not supported.
 
@@ -113,6 +114,10 @@ Sequences can only be iterated in the forwards direction, so `rbegin()` and `ren
 `bool any()`, `bool any(Pred p)`
 This is more efficient than `size()>0` because it only needs to check the first item.
 
+front_or_default
+back_or_default
+
+size_type count(Pred)
 
 aggregate
 sum
@@ -126,7 +131,7 @@ Example: hashing a sequence
 
 ## Comparing sequences
 
-Sequences support the normal comparison operators, `==`, `!=`, `<`, `>`, `<=`, `>=`. These perform memberwise equality and lexographical comparison. A comparator can be passed to the `equals` and `lexographical_compare` methods in case the default operator == and < are not correct.
+Sequences support comparison operators, `==`, `!=`, `<`, `>`, `<=`, `>=`. These perform memberwise equality and lexographical comparison. A comparator can be passed to the `equals()` and `lexographical_compare()` methods in case you need something other than the default `==` and `<` operators.
 
 Example:
 
@@ -185,28 +190,25 @@ The other question is, do we want the caller or the callee to decide how to stor
 
 To unify this mess, we provide `class output_sequence<T>` which provides a generic wrapper for building lists. Like `sequence<>` it is designed to be a lightweight way to unify all of these approaches.
 
-To use an output sequence, pass it in as a 
+To use an output sequence, pass it in as an argument, 
 
 ```c++
     void getItems(const output_sequence<std::string> & output)
     {
-        output.add("foo");
-        output.add("bar");
-
-        list("foo","bar").send_to(output);
+        output << "foo" << "bar" << list("foo","bar");
     }
 ```
 
 The caller uses the `writer()` function to create a writer that wraps either a container or a function.
 
 1. `writer(container)` - creates a writer that appends to a container
-2. `writer(fn)` - creates a writer that calls a function.
+2. `writer<T>(fn)` - creates a writer that calls a function.
 
 ```c++
     std::vector<std::string> vec;
 
     getItems(writer(vec));
-    getItems(writer([](const char * str) { std::cout << "Option is " << str << std::endl; });
+    getItems(writer<const char*>([](const char * str) { std::cout << "Option is " << str << std::endl; });
 ```
 
 The writer actually uses a virtual function, incurring a cost of one virtual function call per item. This really isn't much, but to speed things up slightly, we could instead use a template in the callee.
@@ -215,8 +217,9 @@ The writer actually uses a virtual function, incurring a cost of one virtual fun
 template<typename Writer, typename = is_writer<Writer>::type>
 void getItems(Writer writer)
 {
-
+    writer << "foo";
 }
 ```
 
-## Adapting sequences
+## Transforming sequences
+

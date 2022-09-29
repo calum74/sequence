@@ -138,8 +138,10 @@ void test_writers()
     copy(list("a", "b"), writer(vec));
     assert(seq(vec) == list("a", "b"));
 
-    copy(list("writer1","writer2"), writer<const char*>([](auto str){std::cout << str << std::endl;}));
-    copy(list("writer1","writer2"), writer<const char*>([&](auto str){vec.push_back(str);}));
+    copy(list("writer1","writer2"), writer([](const char* str){std::cout << str << std::endl;}));
+    copy(list("writer1","writer2"), writer([&](const char* str){vec.push_back(str);}));
+
+     copy(list("writer1","writer2"), writer([&](const char * str){vec.push_back(str);}));
 }
 
 int main()

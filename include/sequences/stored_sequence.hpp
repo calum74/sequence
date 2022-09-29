@@ -9,8 +9,9 @@ namespace sequences
     public:
         stored_sequence(Container && c) : container(std::move(c)) {}
 
+        // TODO: Do we want this?
         // Efficiency warning
-        stored_sequence(const stored_sequence & other) = delete;
+        // stored_sequence(const stored_sequence & other) = delete;
 
         operator iterator_sequence<typename Container::const_iterator>() { return {container.begin(), container.end()}; }
 

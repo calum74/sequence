@@ -108,16 +108,44 @@ void test_lifetimes()
     testVector(seq(getVector()));
     testVector(list(Element(), Element(), Element(), Element()));
 
-    testVector2(seq(getVector()));
+    // testVector2(seq(getVector()));
     testVector2(list(Element(), Element(), Element(), Element()));
 
     testVector(seq({Element(), Element(), Element(), Element()}));
 
+    // Here be dragons - we're creating a dangling reference to a temporary object
+    // If in doubt, don't store temporary variables in auto variables.
+    // auto tmp = seq(getVector());
+
+    // This also breaks due to the dangling reference.
+    for(auto i : seq(getVector()))
+        assert(i.valid());   
+
+    //testVector(tmp);
+    //testVector2(tmp);
+}
+
+// template<typename T>
+void copy(const sequence<const char*> & input, const output_sequence<const char*> & output)
+{
+    output << input;
+}
+
+void test_writers()
+{
+    std::vector<const char *> vec;
+
+    copy(list("a", "b"), writer(vec));
+    assert(seq(vec) == list("a", "b"));
+
+    copy(list("writer1","writer2"), writer<const char*>([](auto str){std::cout << str << std::endl;}));
+    copy(list("writer1","writer2"), writer<const char*>([&](auto str){vec.push_back(str);}));
 }
 
 int main()
 {
     test_lifetimes();
+    test_writers();
     assert(seq(1,10).size()==10);
     assert(seq(1,10).where([](int x) { return x>4;}).size() == 6);
     assert(seq(1,10).select(

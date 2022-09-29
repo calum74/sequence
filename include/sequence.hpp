@@ -21,11 +21,20 @@
 #include "sequences/take_sequence.hpp"
 #include "sequences/stored_sequence.hpp"
 
+#include "sequences/output_sequence.hpp"
+
 template<typename Container>
 sequences::iterator_sequence<typename Container::const_iterator> seq(const Container &c)
 {
     return {c.begin(), c.end()};
 }
+
+template<typename Container>
+sequences::iterator_sequence<typename Container::const_iterator> seq(Container &c)
+{
+    return {c.begin(), c.end()};
+}
+
 
 template<typename T, int Size>
 pointer_sequence<T> seq(const T (&items)[Size])
@@ -97,3 +106,8 @@ pointer_sequence<T> seq(const std::vector<T, Alloc> & vec)
 {
     return { vec.data(), vec.data()+vec.size() };
 }
+
+// This is really problematic!
+// stored_sequences are pretty slow
+template<typename T>
+sequences::stored_sequence<T> seq(T && src) { return {std::move(src)}; }

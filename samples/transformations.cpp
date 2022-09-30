@@ -38,7 +38,7 @@ int main()
     print(seq1+seq(10,19));
 
     // merge(s,fn) merge two sequences, calling fn on each pair
-//    print(seq1.merge(seq(10,19), [](int a, int b) { return a+b; }));
+    print(seq1.merge(seq(10,19), [](int a, int b) { return a+b; }));
 
     return 0;
 }

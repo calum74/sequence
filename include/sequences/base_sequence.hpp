@@ -207,7 +207,7 @@ namespace sequences
         typedef void is_sequence;
 
         template<typename Seq2, typename Fn, typename = typename Seq2::is_sequence>
-        merge_sequence<Stored, typename Seq2::stored_type> merge(Seq2 seq2, Fn fn) const
+        merge_sequence<Stored, typename Seq2::stored_type, Fn> merge(Seq2 seq2, Fn fn) const
         {
             return { self(), seq2, fn };
         }

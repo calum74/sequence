@@ -29,7 +29,7 @@ namespace sequences
     template<typename T>
     class singleton_sequence;
 
-    template<typename Seq1, typename Seq2>
+    template<typename Seq1, typename Seq2, typename Fn>
     class merge_sequence;
 
     template<typename Seq, typename Predicate>

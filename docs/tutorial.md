@@ -2,31 +2,32 @@
 
 ## Introduction
 
-_Sequence_ is a C++ library for universal sequences. This has 2 main uses:
+_Sequence_ is a C++ library for universal sequences. This has two main uses:
 
 - Make it easier, safer and more efficient to pass lists between functions,
 - Make it easier, safer and more efficient to manipulate and transform lists.
 
-Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1) of course. `IEnumerable<>` provides a common interface to all sequences and is the de facto way to pass any list to and from an API, and to work with lists. Unlike C#, in C++ we can use C++ templates to generate efficient code that avoids many of the potential overheads of abstraction such as virtual function calls and memory allocations.
+Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1). `IEnumerable<>` provides a common interface to all sequences and is the standard way to pass any list to and from an API, and to work with lists. In C++ we can use templates to generate efficient code that avoids many of the potential overheads of abstraction such as virtual function calls and memory allocations. From the user's perspective this is all under the hood, and sequences provide a natural and high level metalanguage to manipulate lists.
 
 ## What is a sequence?
 
-A _sequence_ is defined as a set of ordered elements of the same type. A sequence can even be infinite. Sequences can be used in any situation where a list or collection is required, and replaces the various alternatives in C++ with something simpler and more powerful.
+A _sequence_ is just a series of elements, that can even be infinite. Sequences can be used in any situation where a list or collection is required, and replaces the car crash of alternatives in C++ with something simpler and more powerful.
 
 Sequences can only be iterated in the forwards direction. They are C++ sequential containers, with an input iterator type.
 
-Sequences are lightweight objects that wrap some underlying collection, for example with a pair of iterators. Sequences are generally short-lived convenience objects, implementing an "adapter pattern" to provide a simple and consistent interface over a variety of different implementations and scenarios. This
+Sequences are lightweight wrappers over some underlying collection, that provide a consistent interface across a range of underlying implementations, and imbue collections with additional functionality in a consistent way.
 
-- Provides a consistent interface across a range of underlying implementations,
-- Adds extra functionality to all sequences in a consistent way.
+Sequences are evaluated lazily, processing one element at a time, rather than needing to store the entire sequence. This is generally very efficient.
 
-Sequences are generally evaluated lazily, meaning that elements are processed one and a time, and we rarely need to store the entire sequence. In this example, we do not actually create an array of 1 billion integers, or a filtered array of 500 million integers (the result of the `where` call). Instead the code just iterates as if it were a normal `for` loop:
+In the following example, we do not actually create an array of 1 billion integers, but instead just iterate as if it were a normal `for` loop:
 
 ```c++
     int count = seq(1,1000000000).where([](int n) { return n%2==0; }).size();
 ```
+We can from the disassembly of the code that the compiler has done a reasonable job of optimizing this.
+
 <details>
-<summary>Expand for arm64 disassembly
+<summary>Expand for disassembly
 </summary>
 
 ```
@@ -51,9 +52,9 @@ Sequences are generally evaluated lazily, meaning that elements are processed on
 ```
 </details>
 
-These computed, filtered and transformed sequences can be passed into any function taking a sequence, where they can be enumerated lazily without needing to create another array.
-
 ## Your first sequence
+
+In [Example 1](../samples/example1.cpp) we see the iteration of a sequence constructed from the arguments to the `main()` function. The `seq()` function creates a sequence for the underlying data, and `skip(1)` adapts the original sequence, removing the first element.
 
 ```c++
 #include <sequence.hpp>
@@ -67,6 +68,8 @@ int main(int argc, char**argv)
 ```
 
 ## Creating sequences
+
+The file [creation.cpp](../samples/creation.cpp) shows the various ways that sequences can be created.
 
 The `seq()` function is used to create sequences for a variety of situations. It returns a lightweight wrapper for an appropriate sequence object.
 
@@ -82,7 +85,7 @@ The `seq()` function is used to create sequences for a variety of situations. It
 
 All of these operations are O(1) and efficient. All they really do is wrap the underlying collection in a different type.
 
-The return type of `seq( )` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &`.
+The return type of `seq` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &`.
 
 As a simple example, this `seq()` function wraps a `vector` to create a sequence:
 
@@ -101,11 +104,7 @@ Examples of list:
     auto animals = list("dog", "cat");
 ```
 
-Other sequence can be created by transforming an existing sequence, using the variety of methods on a sequence such as:
-
-* `take`, `skip`, `where`, `select`, `take_until`, `as`
-
-We will talk about these later.
+Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()` and `as()`. We will talk about these in [#transforming-sequences].
 
 ## Using sequences as containers
 
@@ -280,7 +279,7 @@ TODO: Test with maps and sets.
     getItems(receiver([](const std::string & str) { std::cout << "The item was " << str << std::endl; }));
 ```
 
-This design is safe and efficient. There is an overhead of one virtual function call per element of the sequence, with the benefits of a simpler and more generic implementation. Virtual function calls can be avoided if you use templates (see the section on [Performance considerations].)
+This design is safe and efficient. There is an overhead of one virtual function call per element of the sequence, with the benefits of a simpler and more generic implementation. Virtual function calls can be avoided if you use templates (see the section on [performance-considerations].)
 
 ## Transforming sequences
 

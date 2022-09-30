@@ -47,5 +47,8 @@ int main()
     // merge(s,fn) merge two sequences, calling fn on each pair
     print(seq1.merge(seq(10,19), [](int a, int b) { return a+b; }));
 
+    // Cast each element to a new type using as<T>()
+    print(list(true, false).as<int>());
+
     return 0;
 }

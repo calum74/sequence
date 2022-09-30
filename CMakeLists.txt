@@ -17,6 +17,7 @@ add_executable(operations samples/operations.cpp)
 add_executable(writers samples/writers.cpp)
 add_executable(transformations samples/transformations.cpp)
 add_executable(benchmarks test/benchmarks.cpp)
+add_executable(primes samples/primes.cpp)
 
 enable_testing()
 add_test(Unit-tests test_sequence)

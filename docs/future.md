@@ -14,6 +14,10 @@ Complete the API by looking at IEnumerable
 
 Zip.
 
+Consider C++11 compatibility?
+Test on Windows.
+Setup guide.
+
 ## Possible extra features
 
 Use a shared_ptr internally

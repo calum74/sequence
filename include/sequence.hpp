@@ -21,7 +21,7 @@
 #include "sequences/take_sequence.hpp"
 #include "sequences/skip_sequence.hpp"
 #include "sequences/stored_sequence.hpp"
-
+#include "sequences/concat_sequence.hpp"
 #include "sequences/output_sequence.hpp"
 
 template<typename Container, typename = typename Container::value_type>

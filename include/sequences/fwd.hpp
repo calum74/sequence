@@ -17,7 +17,7 @@ namespace sequences
     template<typename T, typename Seq>
     class virtual_sequence;
 
-    template<typename T, typename Seq1, typename Seq2>
+    template<typename Seq1, typename Seq2>
     class concat_sequence;
 
     template<typename T>
@@ -28,4 +28,10 @@ namespace sequences
 
     template<typename T>
     class singleton_sequence;
+
+    template<typename Seq1, typename Seq2>
+    class merge_sequence;
+
+    template<typename Seq, typename Predicate>
+    class take_while_sequence;
 }

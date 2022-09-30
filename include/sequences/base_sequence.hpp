@@ -48,6 +48,8 @@ namespace sequences
         iterator begin() const { return { self(), self().first() }; }
         iterator end() const { return { self(), nullptr }; }
 
+        typedef Stored stored_type;
+
         template<typename Predicate>
         where_sequence<T, Stored, Predicate> where(Predicate p) const
         {
@@ -174,8 +176,6 @@ namespace sequences
             return select([](const T&t) { return U{t}; });
         }
 
-        // typedef Derived stored_type;
-
         bool any() const { return self().first(); }
 
         template<typename Predicate>
@@ -205,5 +205,26 @@ namespace sequences
         size_type count(Predicate p) { return where(p).size(); }
 
         typedef void is_sequence;
+
+        template<typename Seq2, typename Fn, typename = typename Seq2::is_sequence>
+        merge_sequence<Stored, typename Seq2::stored_type> merge(Seq2 seq2, Fn fn) const
+        {
+            return { self(), seq2, fn };
+        }
+
+        template<typename Predicate>
+        take_while_sequence<Stored, Predicate> take_while(Predicate p) const { return {self(), p }; }
+
+        template<typename Seq2, typename = typename Seq2::is_sequence>
+        concat_sequence<stored_type, typename Seq2::stored_type> concat(Seq2 seq2) const
+        {
+            return {self(), seq2};
+        }
+
+        template<typename Seq2, typename = typename Seq2::is_sequence>
+        concat_sequence<stored_type, typename Seq2::stored_type> operator+(Seq2 seq2) const
+        {
+            return {self(), seq2};
+        }
     };
 }

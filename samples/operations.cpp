@@ -37,5 +37,19 @@ int main()
     // count(p) counts the number of elements matching the given predicate
     std::cout << s.count([](const char * str) { return std::strcmp(str, "b")==0; }) << std::endl;
 
+    // Sequences can be compared for element-wise equality
+    // It uses the default == operator on the element type, so in this example we'll first
+    // convert the sequences to std::string for sensible results.
+    std::cout << (s.as<std::string>() == list("a","b","c").as<std::string>()) << std::endl;
+
+    // The equals() function allows you to specify a comparator function
+    std::cout << s.equals(list("a", "b", "c"), [](const char * s1, const char *s2) { return std::strcmp(s1,s2)==0; }) << std::endl;
+
+    // Other comparators work fine as well
+    std::cout << (s.as<std::string>() < list("a","b","c").as<std::string>()) << std::endl;
+
+    // lexographical_compare allows you to specify a comparator function explicitly
+    std::cout << s.lexographical_compare(list("a", "b", "c"), [](const char * s1, const char *s2) { return std::strcmp(s1,s2)<0; }) << std::endl;
+
     return 0;
 }

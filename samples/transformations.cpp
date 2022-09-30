@@ -31,6 +31,12 @@ int main()
     // take_while(p) carries on taking elements until the condition is false
     print(seq1.take_while([](int n) { return n<=6; }));
 
+    // skip(n) skips a fixed number of elements
+    print(seq1.skip(8));
+
+    // skip_until skips until a condition is true
+    print(seq1.skip_until([](int n) { return (n+1)%5==0; }));
+
     // concat(s) concatenates two sequences
     print(seq1.concat(seq1));
 

@@ -215,6 +215,9 @@ namespace sequences
         template<typename Predicate>
         take_while_sequence<Stored, Predicate> take_while(Predicate p) const { return {self(), p }; }
 
+        template<typename Predicate>
+        skip_until_sequence<Stored, Predicate> skip_until(Predicate p) const { return {self(), p }; }
+
         template<typename Seq2, typename = typename Seq2::is_sequence>
         concat_sequence<stored_type, typename Seq2::stored_type> concat(Seq2 seq2) const
         {

@@ -34,4 +34,7 @@ namespace sequences
 
     template<typename Seq, typename Predicate>
     class take_while_sequence;
+
+    template<typename Seq, typename Predicate>
+    class skip_until_sequence;
 }

@@ -23,6 +23,7 @@
 #include "sequences/stored_sequence.hpp"
 #include "sequences/concat_sequence.hpp"
 #include "sequences/take_while_sequence.hpp"
+#include "sequences/skip_until_sequence.hpp"
 #include "sequences/merge_sequence.hpp"
 #include "sequences/output_sequence.hpp"
 

@@ -24,6 +24,8 @@ Avoid unnecessary copying, particularly of stored_sequence.
 
 Complete the API by looking at IEnumerable
 
+Zip.
+
 ## Possible extra features
 
 Use a shared_ptr internally
@@ -31,3 +33,6 @@ Reverse
 Sort
 
 Idea of an existing list - a deque() that wraps 
+
+Get a reverse list
+More efficient back() and at()

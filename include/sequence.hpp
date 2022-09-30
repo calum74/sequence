@@ -19,6 +19,7 @@
 #include "sequences/stored_array_sequence.hpp"
 #include "sequences/pointer_sequence.hpp"
 #include "sequences/take_sequence.hpp"
+#include "sequences/skip_sequence.hpp"
 #include "sequences/stored_sequence.hpp"
 
 #include "sequences/output_sequence.hpp"

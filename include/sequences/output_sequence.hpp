@@ -23,6 +23,7 @@ public:
 
 namespace sequences
 {
+    // TODO: Just use a function_inserter
     template<typename T, typename It>
     class back_inserter_sequence : public output_sequence<T>
     {

@@ -9,5 +9,7 @@ include_directories(include)
 
 add_executable(test_sequence test/test_sequence.cpp)
 
+add_executable(example1 samples/example1.cpp)
+
 enable_testing()
 add_test(Unit-tests test_sequence)

@@ -92,6 +92,16 @@ namespace sequences
             throw std::out_of_range("at() is out of range");
         }
 
+        value_type at_or_default(size_type index, const value_type & value) const
+        {
+            for(auto c = self().first(); c; c=self().next())
+            {
+                if(index--==0) return *c;
+            }
+            return value;
+        }
+
+
         // TODO: Rename this
         const value_type &front() const
         {
@@ -170,6 +180,29 @@ namespace sequences
 
         template<typename Predicate>
         bool any(Predicate p) const { return where(p).any(); }
+
+        bool empty() const { return !any(); }
+
+        value_type front_or_default(const T & value) const
+        {
+            auto c = self().first();
+            if(!c) return value;
+            return *c;            
+        }
+
+        value_type back_or_default(const value_type & value) const
+        {
+            for(auto c = self().first(); c;)
+            {
+                auto c2 = self().next();
+                if(!c2) return *c;
+                c = c2;
+            }
+            return value;
+        }
+
+        template<typename Predicate>
+        size_type count(Predicate p) { return where(p).size(); }
 
         typedef void is_sequence;
     };

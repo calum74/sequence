@@ -8,18 +8,6 @@ Tutorial and examples finished. Version 1.0a released
 
 cloning sequences - clone().
 
-
-```
-writable_sequence<T>:
-```
-
-Pipe interface
-```
-seq(vec) | where(...) | select(...) | count() >> seq(vec2);
-```
-
-Returning sequences. sequence_writer<> maybe
-
 Avoid unnecessary copying, particularly of stored_sequence.
 
 Complete the API by looking at IEnumerable

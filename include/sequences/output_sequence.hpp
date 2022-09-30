@@ -19,6 +19,8 @@ public:
         add(item);
         return *this;
     }
+
+    typedef void is_output_sequence;
 };
 
 namespace sequences

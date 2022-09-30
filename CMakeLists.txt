@@ -10,6 +10,8 @@ include_directories(include)
 add_executable(test_sequence test/test_sequence.cpp)
 
 add_executable(example1 samples/example1.cpp)
+add_executable(templates samples/templates.cpp)
+add_executable(functions samples/functions.cpp)
 
 enable_testing()
 add_test(Unit-tests test_sequence)

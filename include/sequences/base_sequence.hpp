@@ -170,5 +170,7 @@ namespace sequences
 
         template<typename Predicate>
         bool any(Predicate p) const { return where(p).any(); }
+
+        typedef void is_sequence;
     };
 }

@@ -288,14 +288,18 @@ This design is safe and efficient. There is an overhead of one virtual function 
 
 As suggested earlier, _Sequence_ is largely an overhead-free abstraction where the compiler is able to generate efficient code in most circumstances.
 
-Sequence transformations are evaluated lazily, so are generally more efficient than computing the entire array.
+Sequence transformations are evaluated lazily, so are generally more efficient than creating an entire array.
 
-There is an overhead at function boundaries, where where types `sequence<T>` and `output_sequence<T>` use virtual functions. Here there is one virtual function call per element in the sequence, with the benefits of separate compilation, where the function can be implemented in a `.cpp` file.
+There is overhead at function boundaries, where where types `sequence<T>` and `output_sequence<T>` use virtual functions. Here there is one virtual function call per element in the sequence, with the benefits of separate compilation where the function can be implemented in a `.cpp` file.
 
-!! Talk about header files and a complete example !!
+Where performance is critical, we can use `class pointer_sequence<T>` instead, which requires that the underlying data is stored in an array. Of course, this excludes computed sequences, but still covers many scenarios.
 
+```c++
+    // Example of pointer_sequence...
+```
 
+For even better performance across function boundaries, we can still resort to templated functions.
 
-Generated code.
-
-Using templates instead
+```c++
+    Example here...
+```

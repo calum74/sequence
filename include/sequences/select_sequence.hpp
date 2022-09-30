@@ -3,11 +3,11 @@
 namespace sequences
 {
     template<typename T, typename Seq, typename Fn>
-    class select_sequence : public base_sequence<std::invoke_result_t<Fn, T>, select_sequence<T,Seq,Fn>>
+    class select_sequence : public base_sequence<typename helpers::deduce_result<Fn>::type, select_sequence<T,Seq,Fn>>
     {
         Seq seq;
         Fn fn;
-        typedef std::invoke_result_t<Fn, T> value_type;
+        typedef typename helpers::deduce_result<Fn>::type value_type;
         value_type current;
     public:
         select_sequence(const Seq &seq, Fn fn) : seq(seq), fn(fn) {}

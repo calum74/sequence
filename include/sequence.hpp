@@ -7,6 +7,7 @@
 
 #include "sequence_fwd.hpp"
 #include "sequences/fwd.hpp"
+#include "sequences/deduce_param.hpp"
 #include "sequences/base_sequence.hpp"
 #include "sequences/sequence.hpp"
 #include "sequences/virtual_sequence.hpp"

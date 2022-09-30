@@ -2,7 +2,7 @@ namespace sequences
 {
     template<typename Seq1, typename Seq2, typename Fn>
     class merge_sequence : public base_sequence<
-        std::invoke_result_t<Fn, typename Seq1::value_type, typename Seq2::value_type>, 
+        typename helpers::deduce_result<Fn>::type, 
         merge_sequence<Seq1, Seq2, Fn>>
     {
         Seq1 seq1;
@@ -11,7 +11,7 @@ namespace sequences
     public:
         merge_sequence(const Seq1 & s1, const Seq2 & s2, Fn fn) : seq1(s1), seq2(s2), fn(fn) {}
 
-        typedef std::invoke_result_t<Fn, typename Seq1::value_type, typename Seq2::value_type> value_type;
+        typedef typename helpers::deduce_result<Fn>::type value_type;
 
         value_type current;
 

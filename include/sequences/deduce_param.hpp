@@ -23,4 +23,24 @@ namespace helpers
     };
 
     // TODO: Other function forms
+
+    // Another helper
+    template<typename Fn>
+    struct deduce_result : public deduce_result<decltype(&Fn::operator())>
+    {
+    };
+
+    template<typename R, typename C, typename...Args>
+    struct deduce_result<R(C::*)(Args&&...) const>
+    {
+        typedef R type;
+    };
+
+    template<typename R, typename C, typename...Args>
+    struct deduce_result<R(C::*)(Args...) const>
+    {
+        typedef R type;
+    };
+
+
 }

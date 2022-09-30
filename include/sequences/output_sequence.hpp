@@ -41,10 +41,25 @@ template<typename Fn, typename T>
 sequences::function_inserter<T, Fn> receiver(Fn fn) { return {fn}; }
 
 template<typename Fn, typename = decltype(&Fn::operator())>
-sequences::function_inserter<typename helpers::deduce_param<Fn>::type, Fn> receiver(Fn fn) { return {fn}; }
+sequences::function_inserter<typename sequences::helpers::deduce_param<Fn>::type, Fn> receiver(Fn fn) { return {fn}; }
+
+namespace sequences
+{
+    namespace detail
+    {
+        template<typename Container>
+        struct appender
+        {
+            Container & c;
+            void operator()(const typename Container::value_type & item) const {
+                c.insert(c.end(), item);
+            }
+        };
+    }
+}
 
 template<typename Container>
-auto writer(Container & c)
+sequences::function_inserter<typename Container::value_type, sequences::detail::appender<Container>> writer(Container & c)
 {
-    return receiver([&c](const typename Container::value_type&item) { c.insert(c.end(), item); });
+    return {sequences::detail::appender<Container>{c}};
 }

@@ -170,10 +170,18 @@ namespace sequences
             return !i1;
         }
 
+    private:
         template<typename U>
-        auto as() const
+        struct asFn
         {
-            return select([](const T&t) { return U{t}; });
+            U operator()(const T &t) const { return U{t}; }
+        };
+    public:
+
+        template<typename U>
+        select_sequence<T, Derived, asFn<U>> as() const
+        {
+            return { self(), {} };
         }
 
         bool any() const { return self().first(); }

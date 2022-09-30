@@ -221,7 +221,7 @@ Remember to configure our project for a release build (`cmake .. -DCMAKE_BUILD_T
 <details>
 <summary>Click here for disassembly
 </summary>
-
+arm64
 ```
 0000000100001f94 <__Z13do_benchmark2v>:
 100001f94: 0b 00 80 52 	mov	w11, #0

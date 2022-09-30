@@ -15,6 +15,7 @@ Implement all the comparators
 Consider C++11 compatibility?
 Test on Windows.
 Setup guide.
+Think about namespaces of seq, receiver and writer.
 
 ## Possible extra features
 

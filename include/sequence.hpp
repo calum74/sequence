@@ -5,6 +5,12 @@
 
 #pragma once
 
+namespace std
+{
+    template<typename, typename> class vector;
+}
+
+#include <cstring>
 #include "sequence_fwd.hpp"
 #include "sequences/fwd.hpp"
 #include "sequences/deduce_param.hpp"
@@ -92,7 +98,7 @@ inline sequences::iterator_sequence<detail::int_iterator> seq(int a, int b)
 }
 
 inline pointer_sequence<char> seq(const char * cstr) {
-    return {cstr, cstr+strlen(cstr) };
+    return {cstr, cstr+std::strlen(cstr) };
 }
 
 template<typename T>

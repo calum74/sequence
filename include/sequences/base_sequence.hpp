@@ -25,10 +25,10 @@ namespace sequences
 
         struct iterator
         {
+            typedef T value_type;
             Derived & underlying;
             const value_type * current;
 
-            typedef value_type value_type;
             typedef value_type & reference;
             typedef value_type & pointer;
             typedef std::size_t size_type;

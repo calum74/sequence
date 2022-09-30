@@ -29,7 +29,7 @@ int main()
     print(seq1.take(3));
 
     // take_while(p) carries on taking elements until the condition is false
-//print(seq1.take_while([](int n) { return n<=6; }));
+    print(seq1.take_while([](int n) { return n<=6; }));
 
     // concat(s) concatenates two sequences
     print(seq1.concat(seq1));

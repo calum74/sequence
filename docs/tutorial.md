@@ -69,8 +69,6 @@ int main(int argc, char**argv)
 
 ## Creating sequences
 
-The file [creation.cpp](../samples/creation.cpp) shows the various ways that sequences can be created.
-
 The `seq()` function is used to create sequences for a variety of situations. It returns a lightweight wrapper for an appropriate sequence object.
 
 1. `seq<T>()` called with no arguments returns an empty sequence. In this case, you need to specify the type `T` of the sequence.
@@ -83,26 +81,47 @@ The `seq()` function is used to create sequences for a variety of situations. It
 
 5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range a-b.
 
+
 All of these operations are O(1) and efficient. All they really do is wrap the underlying collection in a different type.
 
 The return type of `seq` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &`.
 
 As a simple example, this `seq()` function wraps a `vector` to create a sequence:
 
-```c++
-    std::vector<std::string> params;
+The example [creation.cpp](../samples/creation.cpp) shows the various ways that sequences can be created:
 
-    init(seq(params));
+```c++
+    // Create an empty sequence (or an empty list - they are the same thing)
+    print(seq<const char*>());
+    print(list<const char*>());
+
+    // Create a sequence with the given items
+    print(list("hello"));
+    print(list("cat", "dog", "parrot"));
+
+    // Create a sequence from a container
+    std::vector<const char*> items { "Beethoven", "Chopin", "Liszt"};
+    print(seq(items));
+
+    // Create a sequence from iterators
+    print(seq(items.rbegin(), items.rend()));
+
+    // Create a sequence from C arrays
+    const char *carray[] = { "Red", "White", "Rose" };
+    print(seq(carray));
+    print(seq(carray+1, 2));
+
+    // Create an integer range
+    auto r = seq(1,10);
+
+    // Output: 55
+    std::cout << r.sum() << std::endl;
+
+    // Create a sequence of characters in a C string
+    std::cout << seq("Bergerac").size() << std::endl;
 ```
 
 Lists are created using the `list()` function.  A list is just another type of sequence, but this does copy its elements into an internal fixed-length array. `list()` is variadic, taking any number of arguments.
-
-Examples of list:
-
-```c++
-    auto numbers = list(1,2,3);
-    auto animals = list("dog", "cat");
-```
 
 Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()` and `as()`. We will talk about these in [Transforming Sequences](#transforming-sequences).
 
@@ -115,7 +134,7 @@ Sequences behave mostly like normal C++ containers, so can for example just be i
         ...
 ```
 
-The normal container functions are supported, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()`.
+The normal container functions are supported, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()` etc.
 
 The performance characteristics of these functions is O(1) with the exceptions:
 
@@ -123,9 +142,7 @@ The performance characteristics of these functions is O(1) with the exceptions:
 * `back()` is O(1) or O(n)
 * `at(n)` is O(1) or O(`n`)
 
-TODO: Implement these efficiently
-
-Sequences are not modifiable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Adapting sequences] on how to do this.
+Sequences are not modifiable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Transformaing sequences](#transforming-sequences) on how to do this.
 
 Sequences can only be iterated in the forwards direction, so `rbegin()` and `rend()` are not supported.
 

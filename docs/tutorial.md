@@ -104,7 +104,7 @@ Examples of list:
     auto animals = list("dog", "cat");
 ```
 
-Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()` and `as()`. We will talk about these in [#transforming-sequences].
+Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()` and `as()`. We will talk about these in [Transforming Sequences](#transforming-sequences).
 
 ## Using sequences as containers
 

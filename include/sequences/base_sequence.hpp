@@ -229,5 +229,17 @@ namespace sequences
         {
             return {self(), seq2};
         }
+
+        template<typename U>
+        void write_to(const output_sequence<U> & out) const
+        {
+            for(auto &i: *this) out.add(i);
+        }
+
+        template<typename Container>
+        void write_to(Container &c) const
+        {
+            for(auto &i: *this) c.insert(c.end(), i);
+        }
     };
 }

@@ -7,7 +7,7 @@ public:
     typedef T value_type;
     virtual void add(const T & item) const =0;
 
-    template<typename Seq>
+    template<typename Seq, typename = typename Seq::is_sequence>
     const output_sequence<T> & operator<<(const Seq & seq) const
     {
         for(auto &i: seq) add(i);
@@ -48,10 +48,10 @@ namespace sequences
 // TODO: Think about a namespace
 
 template<typename Fn, typename T>
-sequences::function_inserter<T, Fn> writer(Fn fn) { return {fn}; }
+sequences::function_inserter<T, Fn> receiver(Fn fn) { return {fn}; }
 
 template<typename Fn, typename = decltype(&Fn::operator())>
-sequences::function_inserter<typename helpers::deduce_param<Fn>::type, Fn> writer(Fn fn) { return {fn}; }
+sequences::function_inserter<typename helpers::deduce_param<Fn>::type, Fn> receiver(Fn fn) { return {fn}; }
 
 template<typename Container>
 sequences::back_inserter_sequence<typename Container::value_type, std::back_insert_iterator<Container>>

@@ -30,6 +30,6 @@ void getItems(Seq s)
 int main(int argc, char**argv)
 {
     setItems(seq(argv, argc).skip(1));
-    getItems(writer([](const char * str) { std::cout << "Got " << str << std::endl;}));
+    getItems(receiver([](const char * str) { std::cout << "Got " << str << std::endl;}));
     return 0;
 }

@@ -42,6 +42,7 @@ int main()
 
     // Also the + operator provides this
     print(seq1+seq(10,19));
+    print(list(1,2,3)+list(4));
 
     // merge(s,fn) merge two sequences, calling fn on each pair
     print(seq1.merge(seq(10,19), [](int a, int b) { return a+b; }));

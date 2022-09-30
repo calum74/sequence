@@ -3,6 +3,7 @@
 
 #include <sequence.hpp>
 #include <iostream>
+#include <vector>
 
 int main()
 {
@@ -50,6 +51,10 @@ int main()
 
     // lexographical_compare allows you to specify a comparator function explicitly
     std::cout << s.lexographical_compare(list("a", "b", "c"), [](const char * s1, const char *s2) { return std::strcmp(s1,s2)<0; }) << std::endl;
+
+    // Write the contents to a container
+    std::vector<const char *> items;
+    s.write_to(items);
 
     return 0;
 }

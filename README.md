@@ -249,4 +249,4 @@ Sample output
 * Regular C code: 112.628 ms
 * Sequence: 347.1 ms
 
-Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop. The only explanation I can think of is that the compiler just did a better job on the C code. The code generated for `sequence` is actually excellent.
+Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop. The only explanation I can think of is that the compiler just did a better job on the C code, perhaps due to branch prediction. The code generated for `sequence` is actually excellent.

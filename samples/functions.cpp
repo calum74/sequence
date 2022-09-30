@@ -1,16 +1,11 @@
 // This example demonstrates how to pass sequences to functions.
 
-// You can include this header file if you only need
-// the forward declarations (for example in a header file)
-#include <sequence_fwd.hpp>
-
-void process1(const sequence<int> & items);
-void process2(const pointer_sequence<int> & items);
-
-// In the .cpp file itself, you need to include the full library
+// In the .cpp file itself, you still need to include the full library
 #include <sequence.hpp>
 #include <iostream>
+#include "functions.hpp"
 
+// This is a regular function that processes a sequence.
 void process1(const sequence<int> & items)
 {
     std::cout << "The sum is " << items.sum() << std::endl;

@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <vector>
-#include <chrono>
 #include <map>
 
 #undef NDEBUG
@@ -38,39 +37,6 @@ void init(const pointer_sequence<const char *> & params)
         handleOption(p);
 }
 
-const int N=1000000000;
-
-int do_benchmark1()
-{
-    int sum=0;
-    for(int i=0; i<=N; i++)
-        if(i%2==0)
-            sum += i*i;
-    return sum;
-}
-
-void benchmark1()
-{
-    auto t1 = std::chrono::high_resolution_clock::now();
-    int sum=do_benchmark1();
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << sum << " completed in " << std::chrono::duration<double, std::milli>(t2-t1).count() << " ms" << std::endl;
-}
-
-int do_benchmark2()
-{
-    return seq(0, N).
-        where([](int n) { return n%2==0; }).
-        select([](int n) { return n*n; }).sum();
-}
-
-void benchmark2()
-{
-    auto t1 = std::chrono::high_resolution_clock::now();
-    int sum = do_benchmark2();
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << sum << " completed in " << std::chrono::duration<double, std::milli>(t2-t1).count() << " ms" << std::endl;
-}
 
 class Element
 {
@@ -244,10 +210,6 @@ int main()
     // This should work!
     assert(seq(std::string("hello")).size()==5);
     assert(seq((const std::string&)std::string("hello")).size()==5);
-
-    std::cout << "Running benchmarks...\n";
-    benchmark1();
-    benchmark2();
 
     return 0;
 }

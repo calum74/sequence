@@ -4,6 +4,8 @@
 #include <vector>
 #include <set>
 #include <string>
+#include <iostream>
+#include <list>
 
 void moreItems(const output_sequence<std::string> & output)
 {
@@ -25,7 +27,7 @@ void getItems(const output_sequence<std::string> & output)
     // You can also send sequences via the << operator
     output << list("Item 6");
 
-    // You can build up the list over several functions
+    // You can build up the output over several functions
     moreItems(output);
 }
 
@@ -33,12 +35,17 @@ int main()
 {
     std::vector<std::string> vec;
     std::set<std::string> set;
+    std::list<std::string> list;
 
     // writer() creates a writer that adds the items to a container
     getItems(writer(vec));
 
     // It doesn't matter what container you use
-    // getItems(writer(set));
+    getItems(writer(set));
+    getItems(writer(list));
+
+    // receiver() specifies a function that will receive the itens
+    getItems(receiver([](const std::string & str) { std::cout << str << std::endl; }));
 
     return 0;
 }

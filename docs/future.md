@@ -6,13 +6,11 @@ Tutorial and examples finished. Version 1.0a released
 
 ## Outstanding issues
 
-cloning sequences - clone().
-
 Avoid unnecessary copying, particularly of stored_sequence.
 
 Complete the API by looking at IEnumerable
 
-Zip.
+Implement all the comparators
 
 Consider C++11 compatibility?
 Test on Windows.
@@ -23,8 +21,7 @@ Setup guide.
 Use a shared_ptr internally
 Reverse
 Sort
-
-Idea of an existing list - a deque() that wraps 
+unique
 
 Get a reverse list
 More efficient back() and at()

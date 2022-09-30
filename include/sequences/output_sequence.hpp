@@ -25,16 +25,6 @@ public:
 
 namespace sequences
 {
-    // TODO: Just use a function_inserter
-    template<typename T, typename It>
-    class back_inserter_sequence : public output_sequence<T>
-    {
-        mutable It back_inserter;
-    public:
-        back_inserter_sequence(It it) : back_inserter(it) {}
-        void add(const T & item) const override { *back_inserter++ = item; }
-    };
-
     template<typename T, typename Fn>
     class function_inserter : public output_sequence<T>
     {
@@ -54,8 +44,7 @@ template<typename Fn, typename = decltype(&Fn::operator())>
 sequences::function_inserter<typename helpers::deduce_param<Fn>::type, Fn> receiver(Fn fn) { return {fn}; }
 
 template<typename Container>
-sequences::back_inserter_sequence<typename Container::value_type, std::back_insert_iterator<Container>>
-writer(Container & c)
+auto writer(Container & c)
 {
-    return { std::back_inserter(c) };
+    return receiver([&c](const typename Container::value_type&item) { c.insert(c.end(), item); });
 }

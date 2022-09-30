@@ -38,5 +38,8 @@ int main()
     // Output: 55
     std::cout << r.sum() << std::endl;
 
+    // Create a sequence of characters in a C string
+    std::cout << seq("Bergerac").size() << std::endl;
+
     return 0;
 }

@@ -4,22 +4,24 @@ Universal sequences in C++
 
 ## Getting started
 
-_Sequence_ is a header-only C++ library compatible with C++ 11 and higher. It has no other dependencies and should work fine on all platforms. Read the [tutorial] to learn how to use this library. [setup] gives further build instructions if needed.
+_Sequence_ is a header-only C++ library compatible with C++ 11 and higher. It has no other dependencies and should work fine on all platforms. Read the [Tutorial](docs/tutorial.md) to learn how to use this library. [Setup instructions](docs/setup.md) gives further build instructions if needed.
 
 ## Overview
 
 _Sequence_ provides a simple, efficient and uniform way to create, pass and manipulate sequences in C++. It aims to do two things:
 
-- Provide a unified & lightweight abstraction for creating and passing sequences
+- Provide a unified and lightweight abstraction for creating and passing sequences
 - Provide a [LINQ](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/)-style library for transforming and manipulating sequences
 
 It is motivated by the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, and they all have their drawbacks.
 
 To solve this, we introduce a universal sequence type, `sequence<T>` that represents any sequence of type `T`. `sequence<T>` unifies the many abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates. _Sequence_ wraps all of these in a unified abstraction.
 
+Sequences can be more efficient than containers because their contents are streamed and evaluated one element at a time without needing to store the entire sequence.
+
 ### Example 1
 
-The first example ([source code](../samples/example2.cpp)) shows processing of command-line arguments. It shows the creation of a sequence using `seq()`, and then the filtering and transformation of sequences using `where()`, `select()`, `skip()`, `as<>()`, `take_while()` and `skip_until()`. It also shows how sequences are passed into functions using `sequence<T>`.
+The first example ([source code](samples/example2.cpp)) shows processing of command-line arguments. It shows the creation of a sequence using `seq()`, and then the filtering and transformation of sequences using `where()`, `select()`, `skip()`, `as<>()`, `take_while()` and `skip_until()`. It also shows how sequences are passed into functions using `sequence<T>`.
 
 ```c++
 // This example demonstrates processing command line arguments as a sequence of strings.
@@ -73,7 +75,7 @@ int main(int argc, char**argv)
 
 ### Example 2
 
-The second example ([source code](../samples/primes.cpp)) shows a naive algorithm to produce a list of prime numbers. In regular C++ we would probably implement it like
+The second example ([source code](samples/primes.cpp)) shows a naive algorithm to produce a list of prime numbers. In regular C++ we would probably implement it like
 
 ```c++
     std::vector<int> primes;
@@ -90,7 +92,7 @@ The second example ([source code](../samples/primes.cpp)) shows a naive algorith
     }
 ```
 
-There's not really a convenient way to represent a stream in C++, so we'd probably elect to store the values in a `vector<int>`. Using `sequence`, this can be written as
+There's not really a convenient way to represent a stream in C++, so we'd probably elect to store the values in a `std::vector<int>`. Using `sequence`, this can be written as
 
 ```c++
     auto primes = seq(2,1000).where([](int n) {

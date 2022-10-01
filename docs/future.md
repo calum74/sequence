@@ -26,3 +26,41 @@ unique
 
 Get a reverse list
 More efficient back() and at()
+
+generator functions - how to terminate??
+
+int i=0;
+seq([&](bool & finished) { finished = i<10; return i++; })
+
+Parsing files - line by line for example
+
+class transform
+{
+    int operator()(char input, std::string & output)
+    {
+        return: 0 = end
+        1 = skip
+        2 = result
+    }
+};
+
+class lines
+{
+    bool operator()(const std::string & line)
+    {
+
+    }
+
+};
+
+class file_contents
+{
+
+};
+
+generator(file_contents("foo.txt")).select(lines()). ...
+
+file_sequence("foo.txt").select(lines()).   
+
+Writing your own sequences
+

@@ -20,11 +20,8 @@ namespace sequences
 
         const value_type * next()
         {
-            const value_type * result;
-            do
-                result = seq.next();
-            while(result && !predicate(*result));
-            return result;
+            auto result = seq.next();
+            return result && !predicate(*result) ? nullptr : result;
         }
     };
 }

@@ -7,7 +7,9 @@ namespace sequences
     {
         Seq seq;
         Fn fn;
+    public:
         typedef typename helpers::deduce_result<Fn>::type value_type;
+    private:
         value_type current;
     public:
         select_sequence(const Seq &seq, Fn fn) : seq(seq), fn(fn) {}

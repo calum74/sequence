@@ -10,6 +10,7 @@ include_directories(include)
 add_executable(test_sequence test/test_sequence.cpp)
 
 add_executable(example1 samples/example1.cpp)
+add_executable(example2 samples/example2.cpp)
 add_executable(templates samples/templates.cpp)
 add_executable(functions samples/functions.cpp)
 add_executable(creation samples/creation.cpp)

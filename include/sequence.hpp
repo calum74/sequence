@@ -126,3 +126,9 @@ pointer_sequence<T> seq(const T*a, const T *b) { return {a,b}; }
 
 template<typename It>
 sequences::iterator_sequence<It> seq(It a, It b) { return {a,b}; }
+
+template<typename T>
+sequences::iterator_sequence<std::istream_iterator<T>> seq(std::basic_istream<T> & is)
+{
+    return {{is},{}};
+}

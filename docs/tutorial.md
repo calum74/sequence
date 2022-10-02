@@ -304,6 +304,10 @@ This design is safe and efficient. There is an overhead of one virtual function 
 
 Sequences have another trick up their sleeve, which is the ability to read files and tokenize strings and streams.
 
+```c++
+
+```
+
 ## Performance
 
 Performance of sequences is often equivalent to hand-written code. In [benchmarks.cpp](../test/benchmarks.cpp) we compare code written normally with code written using sequences. We observed a couple of circumstances where sequences are slower, particularly across function boundaries where we would naturally expect a performance cost of the function call, and whenever `sequence<T>&` is used, the code also incurs a cost of one virtual function call per element. This is usually quite acceptable.
@@ -317,8 +321,8 @@ From the disassembly of
 ```
 
 <details>
-<summary>Click here for ARM64 disassembly
-</summary>
+<summary>Click here for ARM64 disassembly</summary>
+
 ```
 0000000100001f94 <__Z13do_benchmark2v>:
 100001f94: 0b 00 80 52 	mov	w11, #0
@@ -343,9 +347,9 @@ From the disassembly of
 
 we see that the compiler has been able to optimize the code quite well.
 
-## pointer_sequence
+### pointer_sequence
 
-Functions can use `const pointer_sequence<T> &` which is a more restricted sequence type, for more performance. This sequence type is stored as a pair of pointers `const T*`, so is suitable for the contents of a `std::vector` for example, and supports all regular sequence methods.
+Functions can use `const pointer_sequence<T> &` which is a more restricted sequence type, for more performance. This sequence type is stored as a pair of pointers `const T*`, so is suitable for the contents of a `std::vector` for example, and supports all regular sequence methods. Of course, the caller then needs to create the array in the first place which is not necessarily convenient or efficient.
 
 i.e.
 

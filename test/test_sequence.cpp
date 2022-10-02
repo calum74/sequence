@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <fstream>
 
 #undef NDEBUG
 #include <cassert>
@@ -120,6 +121,13 @@ void test_repeat()
     assert(list<int>()==list<int>().repeat(0));
 }
 
+void test_files()
+{
+    std::ifstream file("../test/test1.txt");
+    auto chars = seq(file);
+    assert(chars.size()==17);
+}
+
 int main()
 {
     test_lifetimes();
@@ -228,6 +236,7 @@ int main()
     assert(g == seq(0, 9));
 
     test_repeat();
+    test_files();
 
     return 0;
 }

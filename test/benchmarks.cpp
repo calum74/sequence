@@ -13,15 +13,6 @@ int do_benchmark1()
     return sum;
 }
 
-int benchmark1()
-{
-    auto t1 = std::chrono::high_resolution_clock::now();
-    int sum=do_benchmark1();
-    auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "C version completed in " << std::chrono::duration<double, std::milli>(t2-t1).count() << " ms" << std::endl;
-    return sum;
-}
-
 int do_benchmark2()
 {
     return seq(0, N).
@@ -30,13 +21,13 @@ int do_benchmark2()
         sum();
 }
 
-int benchmark2()
+template<typename Fn>
+void benchmark(Fn fn, const char * description)
 {
     auto t1 = std::chrono::high_resolution_clock::now();
-    int sum = do_benchmark2();
+    int sum = fn();
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "Sequence completed in " << std::chrono::duration<double, std::milli>(t2-t1).count() << " ms" << std::endl;
-    return sum;
+    std::cout << description << ": " << std::chrono::duration<double, std::milli>(t2-t1).count() << " ms" << std::endl;
 }
 
 int main()
@@ -44,12 +35,8 @@ int main()
 #ifndef NDEBUG
     std::cout << "WARNING!!! Running in a debug build\n";
 #endif
-    int sum1 = benchmark1();
-    int sum2 = benchmark2();
-    if(sum1!=sum2)
-    {
-        std::cout << "Error: Methods produced different results\n";
-        return 1;
-    }
+    benchmark(do_benchmark1, "1a: C sequence");
+    benchmark(do_benchmark2, "1b: Sequence  ");
+
     return 0;
 }

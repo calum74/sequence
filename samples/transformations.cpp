@@ -50,5 +50,8 @@ int main()
     // Cast each element to a new type using as<T>()
     print(list(true, false).as<int>());
 
+    // Repeat sequence a number of times
+    print(list(1,2).repeat(3));
+
     return 0;
 }

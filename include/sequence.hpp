@@ -28,6 +28,8 @@
 #include "sequences/skip_until_sequence.hpp"
 #include "sequences/merge_sequence.hpp"
 #include "sequences/output_sequence.hpp"
+#include "sequences/generated_sequence.hpp"
+#include "sequences/repeat_sequence.hpp"
 
 template<typename Container, typename = typename Container::value_type>
 sequences::iterator_sequence<typename Container::const_iterator> seq(const Container &c)

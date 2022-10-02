@@ -249,5 +249,10 @@ namespace sequences
         {
             for(auto &i: *this) c.insert(c.end(), i);
         }
+
+        template<typename Container>
+        Container make() { return {begin(), end()}; }
+
+        repeat_sequence<Stored> repeat(int n) const { return { self(), n }; }
     };
 }

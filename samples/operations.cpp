@@ -56,5 +56,8 @@ int main()
     std::vector<const char *> items;
     s.write_to(items);
 
+    // Create a vector
+    auto vec = s.make<std::vector<const char*>>();
+
     return 0;
 }

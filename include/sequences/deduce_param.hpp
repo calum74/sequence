@@ -12,17 +12,24 @@ namespace sequences
         {
         };
 
-        template<typename C, typename T>
-        struct deduce_param<void(C::*)(T) const>
+        template<typename R, typename C, typename T>
+        struct deduce_param<R(C::*)(T) const>
         {
             typedef T type;
         };
 
-        template<typename C, typename T>
-        struct deduce_param<void(C::*)(const T&) const>
+        template<typename R, typename C, typename T>
+        struct deduce_param<R(C::*)(const T&) const>
         {
             typedef T type;
         };
+
+        template<typename R, typename C, typename T>
+        struct deduce_param<R(C::*)(T&) const>
+        {
+            typedef T type;
+        };
+
 
         // TODO: Other function forms
 

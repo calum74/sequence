@@ -92,7 +92,7 @@ The second example ([source code](samples/primes.cpp)) shows a naive algorithm t
     }
 ```
 
-There's not really a convenient way to represent a stream in C++, so we'd probably elect to store the values in a `std::vector<int>`. Using `sequence`, this can be written as
+There's not really a convenient way to represent a stream in C++, so we'd probably elect to store the values in a `std::vector<int>`. Using _Sequence_, this can be written as
 
 ```c++
     auto primes = seq(2,1000).where([](int n) {

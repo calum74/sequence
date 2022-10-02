@@ -37,4 +37,7 @@ namespace sequences
 
     template<typename Seq, typename Predicate>
     class skip_until_sequence;
+
+    template<typename Seq>
+    class repeat_sequence;
 }

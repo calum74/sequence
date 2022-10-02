@@ -110,6 +110,12 @@ void test_writers()
      copy(list("writer1","writer2"), receiver([&](const char * str){vec.push_back(str);}));
 }
 
+void test_repeat()
+{
+    assert(list(1,1,1)==list(1).repeat(3));
+    assert(list<int>()==list(1).repeat(0));
+}
+
 int main()
 {
     test_lifetimes();
@@ -210,6 +216,14 @@ int main()
     // This should work!
     assert(seq(std::string("hello")).size()==5);
     assert(seq((const std::string&)std::string("hello")).size()==5);
+
+    // Generated sequence
+
+    int i=0;
+    auto g = generator([&](int &x) { x=0; i=1; return true; }, [&](int &x) { x = i; return i++<10; });
+    assert(g == seq(0, 9));
+
+    test_repeat();
 
     return 0;
 }

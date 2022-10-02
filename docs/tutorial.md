@@ -229,7 +229,7 @@ and also different possible ways of returning lists:
     void getItems(std::ostream<std::string> &os);
 ```
 
-The drawback with all of these approaches is that they are incompatible - you need to pick a representation up front, provide multiple implementations, or implement your code in header files. They are not always efficient either - sometimes it's just not necessary to store the data in a container.
+The drawback with all of these approaches is that they are incompatible - you need to pick a representation up front, provide multiple implementations, or implement your code in header files. They are not always efficient either - sometimes it's just not necessary to store the data in a container, and there is overhead in creating a list in a different container to the one you already have.
 
 _Sequence_ replaces these methods with the much simpler
 
@@ -300,6 +300,10 @@ This design is safe and efficient. There is an overhead of one virtual function 
 
 ## Transforming sequences
 
+## String processing
+
+
+
 ## Performance considerations
 
 As suggested earlier, _Sequence_ is largely an overhead-free abstraction where the compiler is able to generate efficient code in most circumstances.
@@ -320,7 +324,41 @@ For even better performance across function boundaries, we can still resort to t
     Example here...
 ```
 
+
 # Performance
+
+## Performance vs hand-written code
+
+- [ ] TODO: Building up a string
+- [ ] Repeat implementation
+- [ ] Aggregate over a different datatype
+- Example where we don't need to actually create a vector after all.
+
+When we are in a loop that actually does some work, the overe
+
+```c++
+    std::string result = list('a').repeat(1000000).aggregate(std::string{}, [](const std::string & str, char ch) { return str+ch; });
+
+    std::string result;
+    for(int i=0; i<1000000; i++) result += 'a';
+
+    std::string process(const sequence<char> & input)
+    {
+        return input.aggregate(std::string{}, [](const std::string & str, char ch) { return str+ch; });
+    }
+
+    std::string process1(const sequence<int> & input)
+    {
+        return input.where([](int i) { return i%2==0; ).select([](int i) { return i*i; }).sum();
+    }
+
+    template<typename T>
+    std::string process2(T input)
+    {
+        return input.where([sum();
+    }
+
+```
 
 _Sequence_ is a minimal-overhead library that does not use any containers or heap allocation internally.
 

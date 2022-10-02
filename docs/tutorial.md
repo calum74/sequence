@@ -302,130 +302,13 @@ This design is safe and efficient. There is an overhead of one virtual function 
 
 ## String processing
 
+Sequences have another trick up their sleeve, which is the ability to read files and tokenize strings and streams.
 
+## Performance
 
-## Performance considerations
+Performance of sequences is often equivalent to hand-written code. In [benchmarks.cpp](../test/benchmarks.cpp) we compare code written normally with code written using sequences. We observed a couple of circumstances where sequences are slower, particularly across function boundaries where we would naturally expect a performance cost of the function call, and whenever `sequence<T>&` is used, the code also incurs a cost of one virtual function call per element. This is usually quite acceptable.
 
-As suggested earlier, _Sequence_ is largely an overhead-free abstraction where the compiler is able to generate efficient code in most circumstances.
-
-Sequence transformations are evaluated lazily, so are generally more efficient than creating an entire array.
-
-There is overhead at function boundaries, where where types `sequence<T>` and `output_sequence<T>` use virtual functions. Here there is one virtual function call per element in the sequence, with the benefits of separate compilation where the function can be implemented in a `.cpp` file.
-
-Where performance is critical, we can use `class pointer_sequence<T>` instead, which requires that the underlying data is stored in an array. Of course, this excludes computed sequences, but still covers many scenarios.
-
-```c++
-    // Example of pointer_sequence...
-```
-
-For even better performance across function boundaries, we can still resort to templated functions.
-
-```c++
-    Example here...
-```
-
-
-# Performance
-
-## Performance vs hand-written code
-
-- [ ] TODO: Building up a string
-- [ ] Repeat implementation
-- [ ] Aggregate over a different datatype
-- Example where we don't need to actually create a vector after all.
-
-When we are in a loop that actually does some work, the overe
-
-```c++
-    std::string result = list('a').repeat(1000000).aggregate(std::string{}, [](const std::string & str, char ch) { return str+ch; });
-
-    std::string result;
-    for(int i=0; i<1000000; i++) result += 'a';
-
-    std::string process(const sequence<char> & input)
-    {
-        return input.aggregate(std::string{}, [](const std::string & str, char ch) { return str+ch; });
-    }
-
-    std::string process1(const sequence<int> & input)
-    {
-        return input.where([](int i) { return i%2==0; ).select([](int i) { return i*i; }).sum();
-    }
-
-    template<typename T>
-    std::string process2(T input)
-    {
-        return input.where([sum();
-    }
-
-```
-
-_Sequence_ is a minimal-overhead library that does not use any containers or heap allocation internally.
-
-There is once case where _Sequence_ is a bit more expensive, which is when passing arguments using `const sequence<T>&`. In this case, there is an additional overhead of one virtual function call per item in the sequence. If that is a problem, you can use the even more lightweight `pointer_sequence` instead which does not use virtual functions, but is limited to cases where the data is stored in an underlying array.
-
-## Benchmarks
-
-Remember to configure our project for a release build (`cmake .. -DCMAKE_BUILD_TYPE=Release`) for this.
-
-```c++
-    const int N=1000000000;
-
-    int sum=0;
-    for(int i=0; i<=N; i++)
-        if(i%2==0)
-            sum += i*i;
-```
-
-<details>
-<summary>Click here for disassembly
-</summary>
-
-```
-0000000100001d58 <__Z13do_benchmark1v>:
-100001d58: 00 e4 00 6f 	movi.2d	v0, #0000000000000000
-100001d5c: 81 04 00 4f 	movi.4s	v1, #4
-100001d60: 1f 20 03 d5 	nop
-100001d64: 62 e0 00 9c 	ldr	q2, 0x100003970 <_strlen+0x100003970>
-100001d68: 03 05 00 4f 	movi.4s	v3, #8
-100001d6c: 08 40 99 52 	mov	w8, #51712
-100001d70: 48 73 a7 72 	movk	w8, #15258, lsl #16
-100001d74: 84 05 00 4f 	movi.4s	v4, #12
-100001d78: 25 04 00 4f 	movi.4s	v5, #1
-100001d7c: 06 06 00 4f 	movi.4s	v6, #16
-100001d80: 07 e4 00 6f 	movi.2d	v7, #0000000000000000
-100001d84: 10 e4 00 6f 	movi.2d	v16, #0000000000000000
-100001d88: 11 e4 00 6f 	movi.2d	v17, #0000000000000000
-100001d8c: 52 84 a1 4e 	add.4s	v18, v2, v1
-100001d90: 53 84 a3 4e 	add.4s	v19, v2, v3
-100001d94: 54 84 a4 4e 	add.4s	v20, v2, v4
-100001d98: 55 1c 25 4e 	and.16b	v21, v2, v5
-100001d9c: b5 9a a0 4e 	cmeq.4s	v21, v21, #0
-100001da0: 56 9c a2 4e 	mul.4s	v22, v2, v2
-100001da4: 52 9e b2 4e 	mul.4s	v18, v18, v18
-100001da8: 73 9e b3 4e 	mul.4s	v19, v19, v19
-100001dac: 94 9e b4 4e 	mul.4s	v20, v20, v20
-100001db0: d6 1e 35 4e 	and.16b	v22, v22, v21
-100001db4: 52 1e 35 4e 	and.16b	v18, v18, v21
-100001db8: 73 1e 35 4e 	and.16b	v19, v19, v21
-100001dbc: 94 1e 35 4e 	and.16b	v20, v20, v21
-100001dc0: c0 86 a0 4e 	add.4s	v0, v22, v0
-100001dc4: 47 86 a7 4e 	add.4s	v7, v18, v7
-100001dc8: 70 86 b0 4e 	add.4s	v16, v19, v16
-100001dcc: 91 86 b1 4e 	add.4s	v17, v20, v17
-100001dd0: 42 84 a6 4e 	add.4s	v2, v2, v6
-100001dd4: 08 41 00 71 	subs	w8, w8, #16
-100001dd8: a1 fd ff 54 	b.ne	0x100001d8c <__Z13do_benchmark1v+0x34>
-100001ddc: e0 84 a0 4e 	add.4s	v0, v7, v0
-100001de0: 00 86 a0 4e 	add.4s	v0, v16, v0
-100001de4: 20 86 a0 4e 	add.4s	v0, v17, v0
-100001de8: 00 b8 b1 4e 	addv.4s	s0, v0
-100001dec: 08 00 26 1e 	fmov	w8, s0
-100001df0: 89 ec b4 52 	mov	w9, #-1486618624
-100001df4: 00 01 09 0b 	add	w0, w8, w9
-100001df8: c0 03 5f d6 	ret
-```
-</details>
+From the disassembly of 
 
 ```c++
     int sum = seq(0, N).
@@ -434,9 +317,8 @@ Remember to configure our project for a release build (`cmake .. -DCMAKE_BUILD_T
 ```
 
 <details>
-<summary>Click here for disassembly
+<summary>Click here for ARM64 disassembly
 </summary>
-arm64
 ```
 0000000100001f94 <__Z13do_benchmark2v>:
 100001f94: 0b 00 80 52 	mov	w11, #0
@@ -459,9 +341,23 @@ arm64
 ```
 </details>
 
-Sample output
+we see that the compiler has been able to optimize the code quite well.
 
-* Regular C code: 112.628 ms
-* Sequence: 347.1 ms
+## pointer_sequence
 
-Here, we do see some slowdown (a factor of 3) but this is over an extremely tight loop. The only explanation I can think of is that the compiler just did a better job on the C code, perhaps due to branch prediction. The code generated for `sequence` is actually excellent.
+Functions can use `const pointer_sequence<T> &` which is a more restricted sequence type, for more performance. This sequence type is stored as a pair of pointers `const T*`, so is suitable for the contents of a `std::vector` for example, and supports all regular sequence methods.
+
+i.e.
+
+```c++
+void setItems(const pointer_sequence<const char*> & p);
+```
+
+to avoid the overheads of function calls completely, we can template the function. i.e.
+
+```c++
+template<typename Seq>
+void setItems(Seq seq);
+```
+
+Unless you're sure you need the performace, it's probably not worth it.

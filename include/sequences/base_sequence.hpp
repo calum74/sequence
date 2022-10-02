@@ -271,5 +271,7 @@ namespace sequences
         Container make() { return {begin(), end()}; }
 
         repeat_sequence<Stored> repeat(int n) const { return { self(), n }; }
+
+        split_sequence<Stored> split(const T * splitChars) { return { self(), splitChars}; }
     };
 }

@@ -40,4 +40,7 @@ namespace sequences
 
     template<typename Seq>
     class repeat_sequence;
+
+    template<typename Seq>
+    class split_sequence;
 }

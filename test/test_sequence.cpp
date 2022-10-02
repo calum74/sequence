@@ -123,9 +123,20 @@ void test_repeat()
 
 void test_files()
 {
+    const char * filename = "../test/test1.txt";
     std::ifstream file("../test/test1.txt");
+
     auto chars = seq(file);
-    assert(chars.size()==17);
+    assert(chars.size()==22);
+
+    // Next, split file into lines
+    file.clear();
+    file.seekg(0);
+    assert(seq(file).size()==22);
+
+    file.clear();
+    file.seekg(0);
+    assert(seq(file).split("\n") == list("abc","def","This is line 3"));
 }
 
 int main()

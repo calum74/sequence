@@ -17,13 +17,13 @@
             "MIMode": "lldb"
         },
         {
-            "name": "(lldb) Launch",
+            "name": "unit tests",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/test_sequence",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}/build",
             "environment": [],
             "externalConsole": false,
             "MIMode": "lldb"

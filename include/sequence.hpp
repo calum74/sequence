@@ -30,6 +30,7 @@
 #include "sequences/output_sequence.hpp"
 #include "sequences/generated_sequence.hpp"
 #include "sequences/repeat_sequence.hpp"
+#include "sequences/split_sequence.hpp"
 
 template<typename Container, typename = typename Container::value_type>
 sequences::iterator_sequence<typename Container::const_iterator> seq(const Container &c)
@@ -128,7 +129,7 @@ template<typename It>
 sequences::iterator_sequence<It> seq(It a, It b) { return {a,b}; }
 
 template<typename T>
-sequences::iterator_sequence<std::istream_iterator<T>> seq(std::basic_istream<T> & is)
+sequences::cached_iterator_sequence<std::istreambuf_iterator<T>> seq(std::basic_istream<T> & is)
 {
     return {{is},{}};
 }

@@ -73,10 +73,27 @@ namespace sequences
         }
 
         template<typename Aggregate>
-        T aggregate(Aggregate agg, T result = {}) const
+        T aggregate(Aggregate agg) const
+        {
+            T result = {};
+            for(const value_type * i=self().first(); i; i=self().next())
+                result = agg(result, *i);
+            return result;
+        }
+
+        template<typename Aggregate, typename U>
+        U aggregate(U result, Aggregate agg) const
         {
             for(const value_type * i=self().first(); i; i=self().next())
                 result = agg(result, *i);
+            return result;
+        }
+
+        template<typename Aggregate, typename U>
+        U accumulate(U result, Aggregate agg) const
+        {
+            for(const value_type * i=self().first(); i; i=self().next())
+                agg(result, *i);
             return result;
         }
 

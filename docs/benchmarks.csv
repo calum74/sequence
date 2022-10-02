@@ -1,0 +1,8 @@
+1a: C implementation, 121.671
+1b: Sequence implementation, 320.473
+1c: Sequence passed as reference, 2134.01
+1d: Sequence passed as template, 322.534
+2a: C implementation, 2.61492
+2b: Sequence implementation, 2.31921
+2c: Sequence using naive aggregate, 10357.4
+2d: Sequence passed as reference, 2.9135

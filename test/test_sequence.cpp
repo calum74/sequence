@@ -113,7 +113,11 @@ void test_writers()
 void test_repeat()
 {
     assert(list(1,1,1)==list(1).repeat(3));
+    assert(list(1,2)==list(1,2).repeat(1));
+    assert(list(1,2,1,2)==list(1,2).repeat(2));
     assert(list<int>()==list(1).repeat(0));
+    assert(list<int>()==list<int>().repeat(2));
+    assert(list<int>()==list<int>().repeat(0));
 }
 
 int main()

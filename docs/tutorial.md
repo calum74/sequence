@@ -11,7 +11,7 @@ Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.c
 
 ## What is a sequence?
 
-A _sequence_ is simply a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simpler and more powerful.
+A _sequence_ is simply a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simple and powerful.
 
 Sequences can only be iterated in the forwards direction. Sequences are C++ sequential containers, with an input iterator type.
 
@@ -42,23 +42,23 @@ int main(int argc, char**argv)
 
 ## Creating sequences
 
-The `seq()` function is used to create sequences for a variety of situations. It returns a lightweight wrapper for an appropriate sequence object.
+The `seq()` function is used to create sequences from a variety of data sources. It returns a lightweight wrapper around the underlying data.
 
 1. `seq<T>()` called with no arguments returns an empty sequence. In this case, you need to specify the type `T` of the sequence.
 
-2. `seq(const Container & c)` returns a sequence of the contents of `c`. It returns a sequence that iterates from `c.begin()` to `c.end()`. Of course, the container contents are not copied anywhere and iteration is only performed when it is needed.
+2. `seq(const Container & c)` returns a sequence of the contents of `c`. It returns a sequence that iterates from `c.begin()` to `c.end()`.
 
 3. `seq(const T* array, int size)`, `seq(const T (&array[Size])` returns a sequence of the array contents.
 
 4. `seq(const char* str)` returns the sequence of characters in the null-terminated C-style string `str`.
 
-5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range a-b.
+5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range a to b.
 
 6. `seq(std::basic_istream<T> &)` returns a sequece that iterates the streambuf of a stream.
 
 7. `list(...)` creates a sequence of the given elements.
 
-All of these operations are O(1) and efficient. All they really do is wrap the underlying collection with a different interface.
+All of these operations are lightweight and efficient, and do not iterate the underlying data until asked to do so.
 
 The return type of `seq` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &` argument.
 
@@ -95,7 +95,7 @@ The example [creation.cpp](../samples/creation.cpp) shows the various ways that 
     std::cout << seq("Bergerac").size() << std::endl;
 ```
 
-Lists are created using the `list()` function.  A list is just another type of sequence. `list()` is variadic, taking any number of arguments. The template parameter can be specified explicitly to coerce the list to a given type, for example this is a sequence of type `std::string`:
+Lists are created using the `list()` function. `list()` is variadic, taking any number of arguments. The template parameter can be specified explicitly to coerce the list to a given type, for example this is a sequence of type `std::string`:
 
 ```c++
     auto l = list<std::string>("cat", "dog");
@@ -112,7 +112,7 @@ Sequences are C++ containers, so can for example just be iterated:
         ...
 ```
 
-Sequences support the normal container functions, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()` etc.
+Sequences support normal container functions, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()` etc.
 
 The performance characteristics of these functions are O(1) with the exceptions:
 
@@ -122,42 +122,69 @@ The performance characteristics of these functions are O(1) with the exceptions:
 
 `front()`, `back()` and `at()` throw `std::out_of_bounds` if the sequence doesn't contain a value at the given position.
 
-Sequences are not modifiable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Transformaing sequences](#transforming-sequences) on how to do this.
+Sequences are read-only, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. When you transform a sequence, you create a new sequence without modifying the original.
 
 Sequences can only be iterated in the forwards direction, so `rbegin()` and `rend()` are not supported.
 
 ## Operations
 
-`bool any()` returns true if the sequence contains items. Supplying a predicate function returns if the sequence contains at least one item matching the predicate. This is more efficient than `size()` or `count()` which would need to iterate the entire sequence.
+Sequences support a few extra operations not found on normal containers:
+
+* `any()` - tests if the sequence contains any element / element matching a predicate
+* `count()` - counts the number of elements matching a predicate
+* `value_type front_or_default(const value_type&)`, `back_or_default()` - 
+* `at()` - gets an element at a given position
+* `sum()` - sums all of the elements
+* `aggregate()`, `accumulate()` - runs an arbitrary function ver all elements and computes a result
+
+See [transformations.cpp](samples/transformations.cpp) for examples on how to use these functions.
 
 ```c++
-    if(s.any())
-        std::cout << "The sequence is not empty\n";
+   // front() gets the first element of a list
+    std::cout << s.front() << std::endl;
 
-    if(s.any([](int value) { return value>1000; }))
-        std::cout << "One of the values is > 1000\n";
-```
+    // back() gets the last element in the list
+    std::cout << s.back() << std::endl;
 
-`count(Predicate p)` returns the number of items matching a given predicate. For example
+    // at() gets a given element in the list
+    std::cout << s.at(1) << std::endl;
 
-```c++
-    std::cout << "There are " << s.count([](int value) { return value>1000; })) << " items>1000\n";
-```
+    std::cout << e.front_or_default("<empty>") << std::endl;
+    std::cout << e.back_or_default("<empty>") << std::endl;
+    std::cout << s.at_or_default(100, "<empty>") << std::endl;
 
-`value_type front_or_default(const value_type & d)`, `value_type back_or_default(const value_type & d)` return a default value if the sequence is empty.
+    // any() indicates if there are any elements in the sequence
+    std::cout << s.any() << e.any() << std::endl;
 
-`sum()` returns the sum of all elements, and concatenates strings if the elements are `std::string`. `aggregate()` performs a more general aggregation, starting with the initial value (in the first argument), and applying a function successively. This example computes a hash:
+    // any(p) indicates if there are any items that match the given predicate
+    std::cout << s.any([](const char * str) { return std::strcmp(str, "b")==0; }) << std::endl;
 
+    // empty() is the opposite of any()
+    std::cout << s.empty() << e.empty() << std::endl;
 
-```c++
-    // Simple hash of a sequence of integers
-    int hash = s.aggregate(0, [](int n1, int n2) { return n1*13 + n2; });
-```
+    // size() gives the number of elements in the list
+    std::cout << s.size() << std::endl;
 
-`accumulate()` works very similarly to `aggregate`, but the function uses a different signature which could be more efficient in some circumstances:
+    // count(p) counts the number of elements matching the given predicate
+    std::cout << s.count([](const char * str) { return std::strcmp(str, "b")==0; }) << std::endl;
 
-```c++
-    fasterSum = chars.accumulate(std::string(), [](std::string & str, char c) { str+=c; });
+    // Sequences can be compared for element-wise equality
+    // It uses the default == operator on the element type, so in this example we'll first
+    // convert the sequences to std::string for sensible results.
+    std::cout << (s.as<std::string>() == list("a","b","c").as<std::string>()) << std::endl;
+
+    // The equals() function allows you to specify a comparator function
+    std::cout << s.equals(list("a", "b", "c"), [](const char * s1, const char *s2) { return std::strcmp(s1,s2)==0; }) << std::endl;
+
+    // Other comparators work fine as well
+    std::cout << (s.as<std::string>() < list("a","b","c").as<std::string>()) << std::endl;
+
+    // lexographical_compare allows you to specify a comparator function explicitly
+    std::cout << s.lexographical_compare(list("a", "b", "c"), [](const char * s1, const char *s2) { return std::strcmp(s1,s2)<0; }) << std::endl;
+
+    // A simple hash computation of a list of integers.
+    int hash = list(1,2,3).aggregate(0, [](int n1, int n2) { return n1*13 + n2; });
+
 ```
 
 ## Comparing sequences
@@ -187,39 +214,66 @@ For example the following code is efficient in that it doesn't create any arrays
 
 The data types of `s1`, `s2` and `s3` are unspecified but they are stack objects.
 
-The `where()` transformation filters an existing sequence, returning a sequence with a subset of the original sequence. The `select()` transformation returns a sequence of the original size, but each element is computed based on a function or lambda.
+Transformations include
 
-As a special case of `select()`, the `as<>()` transformation performs a cast of each element to a new type.
+* `where()` - filters a sequence
+* `select()` - maps each element in the sequence
+* `take()` - limits the size of the sequence
+* `skip()` - skips the first elements of the sequence
+* `take_while()` - limits the sequence while a condition is true
+* `skip_until()` - skips the first elements while a condition is true
+* `as<U>()` - converts all elements to a new type `U`
+* `repeat()` - repeats the sequence
+* `merge()` - merge/zip two sequences into one
+* `+`/`concat` - concatenate two sequences
 
-```c++
-    auto args = seq(argv, argc).skip(1).as<std::string>();
-```
-
-`take(int n)` creates a sequence of at most `n` elements - any additional elements are removed. `skip(int n)` creates a sequence where the first `n` elements have been removed.
-
-These could be combined to create a sequence of a specified range, for example:
-
-```c++
-    auto s2 = s1.skip(10).take(5);
-```
-
-`skip_until()` and `take_while()` can be used to `skip` and `take` based on the data in the sequence rather than a fixed number.
-
-`repeat(int n)` is used to repeat a sequence 0 or more times.
+See [transformations.cpp](../samples/transformations.cpp) for examples of transforming sequences:
 
 ```c++
-    auto s = list('a','b').repeat(500);
-```
+    // where(p) filters the selection
+    print(seq1.where([](int x) { return x%2==0; }));
 
-`merge` is used to combine (or "zip") two sequences of the same length. This takes an item from each list and passes them to a functor that combines them into one element. For example
+    // select(p) transforms each element in the selection
+    print(seq1.select([](int x) { return x*2; }));
+    
+    // Of course, you can combine transformations
+    print(seq1.where([](int x) { return x%2==0; }).select([](int x) { return x*2; }));
 
-```c++
-    auto records = names.merge(addresses, [](const std::string &name, const std::string & address) { return Person{name, address}; });
+    // The order in which transformations are applied matters!
+    print(seq1.select([](int x) { return x*2; }).where([](int x) { return x%2==0; }));
+
+    // take(n) limits the number of elements up to the given number
+    print(seq1.take(3));
+
+    // take_while(p) carries on taking elements until the condition is false
+    print(seq1.take_while([](int n) { return n<=6; }));
+
+    // skip(n) skips a fixed number of elements
+    print(seq1.skip(8));
+
+    // skip_until skips until a condition is true
+    print(seq1.skip_until([](int n) { return (n+1)%5==0; }));
+
+    // concat(s) concatenates two sequences
+    print(seq1.concat(seq1));
+
+    // Also the + operator provides this
+    print(seq1+seq(10,19));
+    print(list(1,2,3)+list(4));
+
+    // merge(s,fn) merge two sequences, calling fn on each pair
+    print(seq1.merge(seq(10,19), [](int a, int b) { return a+b; }));
+
+    // Cast each element to a new type using as<T>()
+    print(list(true, false).as<int>());
+
+    // Repeat sequence a number of times
+    print(list(1,2).repeat(3));
 ```
 
 ## Writing sequences
 
-Sequences don't actually store any data, so should copy their contents into a regular C++ container as needed. Then, when the container needs to be queried again, it can again be wrapped in a sequence using `seq`.
+Sequences don't actually store any data, so standard C++ containers should be used for the storage of data.
 
 There are a number of ways to write a sequence `s` to a container `vec`:
 

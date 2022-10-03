@@ -2,6 +2,10 @@
 
 ## Milestone 1
 
+Tidy up everything
+- Docs
+- Code
+
 Tutorial and examples finished. Version 1.0a released
 - Transforming
 - String processing

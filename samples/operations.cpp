@@ -59,5 +59,8 @@ int main()
     // Create a vector
     auto vec = s.make<std::vector<const char*>>();
 
+    // A simple hash computation of a list of integers.
+    int hash = list(1,2,3).aggregate(0, [](int n1, int n2) { return n1*13 + n2; });
+
     return 0;
 }

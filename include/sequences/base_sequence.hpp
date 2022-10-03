@@ -147,9 +147,33 @@ namespace sequences
         }
 
         template<typename T2, typename Derived2,typename Stored2>
+        bool operator!=(const base_sequence<T2,Derived2,Stored2> & other) const
+        {
+            return !(*this == other);
+        }
+
+        template<typename T2, typename Derived2,typename Stored2>
         bool operator<(const base_sequence<T2,Derived2,Stored2> & other) const
         {
             return lexographical_compare(other);
+        }
+
+        template<typename T2, typename Derived2,typename Stored2>
+        bool operator>(const base_sequence<T2,Derived2,Stored2> & other) const
+        {
+            return other<*this;
+        }
+
+        template<typename T2, typename Derived2,typename Stored2>
+        bool operator<=(const base_sequence<T2,Derived2,Stored2> & other) const
+        {
+            return !(other<*this);
+        }
+
+        template<typename T2, typename Derived2,typename Stored2>
+        bool operator>=(const base_sequence<T2,Derived2,Stored2> & other) const
+        {
+            return !(*this<other);
         }
 
         template<typename T2, typename Derived2, typename Stored2, typename Eq = std::equal_to<T>>
@@ -182,7 +206,7 @@ namespace sequences
                 i2 = other.self().next();
             }
 
-            return !i1;
+            return i2;
         }
 
     private:

@@ -198,6 +198,52 @@ void test_range()
     //    std::cout << x << std::endl;
 }
 
+void test_comparisons()
+{
+    auto e = list<int>();
+
+    // Equality
+    assert(e==e);
+    assert(list(1)==list(1));
+    assert(list(1,2)==list(1,2));
+
+    // !=
+    assert(e!=list(1));
+    assert(list(1)!=e);
+    assert(list(1)!=list(2));
+    assert(list(1)!=list(1,2));
+
+    // <
+    assert(e < list(1));
+    assert(list(1) < list(1,2));
+    assert(list(1) < list(2));
+
+    // <=
+    assert(e<=e);
+    assert(e<=list(1));
+    assert(list(1)<=list(1));
+    assert(list(1)<=list(1,2));
+    assert(list(1)<=list(2));
+    assert(list(1,2)<=list(1,2));
+    assert(list(1,2)<=list(1,3));
+    assert(list(1,2)<=list(2,1));
+
+    // >
+    assert(list(1) > e);
+    assert(list(1,2) > list(1));
+    assert(list(2) > list(1));
+
+    // >=
+    assert(e>=e);
+    assert(list(1)>=e);
+    assert(list(1)>=list(1));
+    assert(list(1,2)>=list(1));
+    assert(list(2)>=list(1));
+    assert(list(1,2)>=list(1,2));
+    assert(list(1,3)>=list(1,2));
+    assert(list(2,1)>=list(1,2));
+}
+
 void test_single()
 {
     auto d = single(3);
@@ -293,6 +339,7 @@ int main()
     test_lifetimes();
     test_writers();
     test_range();
+    test_comparisons();
     test_single();
     test_list();
     test_primes();

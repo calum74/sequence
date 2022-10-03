@@ -191,6 +191,7 @@ namespace sequences
         {
             U operator()(const T &t) const { return U{t}; }
         };
+
     public:
 
         template<typename U>
@@ -198,6 +199,10 @@ namespace sequences
         {
             return { self(), {} };
         }
+
+        select_sequence<T, Derived, helpers::project_first<value_type>> keys() const { return { self(), {}}; }
+        
+        select_sequence<T, Derived, helpers::project_second<value_type>> values() const { return { self(), {}}; }
 
         bool any() const { return self().first(); }
 

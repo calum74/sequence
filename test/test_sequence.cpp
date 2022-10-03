@@ -40,7 +40,6 @@ void init(const pointer_sequence<const char *> & params)
         handleOption(p);
 }
 
-
 class Element
 {
     bool constructed;
@@ -76,25 +75,19 @@ void test_lifetimes()
 {
     testVector(seq(getVector()));
     testVector(list(Element(), Element(), Element(), Element()));
-
-    // testVector2(seq(getVector()));
     testVector2(list(Element(), Element(), Element(), Element()));
-
     testVector(seq({Element(), Element(), Element(), Element()}));
 
-    // Here be dragons - we're creating a dangling reference to a temporary object
+    // Here be dragons - we could be creating a dangling reference to a temporary object
     // If in doubt, don't store temporary variables in auto variables.
-    // auto tmp = seq(getVector());
+    auto tmp = seq(getVector());
 
-    // This also breaks due to the dangling reference.
     for(auto i : seq(getVector()))
         assert(i.valid());   
 
-    //testVector(tmp);
-    //testVector2(tmp);
+    testVector(tmp);
 }
 
-// template<typename T>
 void copy(const sequence<const char*> & input, const output_sequence<const char*> & output)
 {
     output << input;
@@ -171,17 +164,16 @@ int computeAsyncSafe2(const pointer_sequence<int> & values) {
 
 void test_async()
 {
-    std::cout << computeAsyncUnsafe(seq(1,10000000)) << std::endl;
+    // This hangs so don't call it.
+    // std::cout << computeAsyncUnsafe(seq(1,10000000)) << std::endl;
     std::cout << computeAsyncSafe1(seq(1,10000000)) << std::endl;
 
     auto values = seq(1,1000000).make<std::vector<int>>();
     std::cout << computeAsyncSafe2(seq(values)) << std::endl;
 }
 
-int main()
+void test_range()
 {
-    test_lifetimes();
-    test_writers();
     assert(seq(1,10).size()==10);
     assert(seq(1,10).where([](int x) { return x>4;}).size() == 6);
     assert(seq(1,10).select(
@@ -204,9 +196,17 @@ int main()
     //    where([](int x) { return x%3!=0;}).
     //    select([](int x) { return "pika "; }))
     //    std::cout << x << std::endl;
+}
 
+void test_single()
+{
     auto d = single(3);
+
     assert(d.size()==1);
+}
+
+void test_list()
+{
     assert(list<int>().size()==0);
 
     auto e = list(1,2,3);
@@ -243,22 +243,15 @@ int main()
 
     init(list("-a", "-b", "-c"));
     init(list("a","b","c"));
+}
 
+void test_primes()
+{
     auto primes = seq(2,1000).where([](int n) {
         return !seq(2,n-1).any([=](int m) { return n%m==0; });
     });
 
-    // Example: iterate the keys or values in a map
-
-    std::map<std::string, int> map1;
-    assert(primes.any());
-
-    // auto primes3 = seq(2,1000).where([=](int n) {
-    //    return !primes3.take_while([=](int m) { return n<m; }).any([](int p) { return n%p==0; });
-
-    for(auto p : primes)
-        std::cout << p << " ";
-    std::cout << std::endl;
+    assert(primes.take(5) == list(2,3,5,7,11));
 
     std::vector<int> primes2;
     for(int n=2; n<=1000; ++n)
@@ -274,24 +267,38 @@ int main()
     }
 
     assert(seq(primes2) == primes);
+}
 
-    // This should work!
-    assert(seq(std::string("hello")).size()==5);
-    assert(seq((const std::string&)std::string("hello")).size()==5);
-
+void test_generator()
+{
     // Generated sequence
-
     int i=0;
     auto g = generator([&](int &x) { x=0; i=1; return true; }, [&](int &x) { x = i; return i++<10; });
     assert(g == seq(0, 9));
+}
 
+void test_keys_and_values()
+{
+    // TODO: Iterate the keys() or values()
+    // Example: iterate the keys or values in a map
+    std::map<std::string, int> map1 = { {"a",1}, {"b",2}, {"c",3}};
+
+    assert(seq(map1).keys().size()==3);
+    assert(seq(map1).keys() == list("a","b","c"));
+    assert(seq(map1).values() == list(1,2,3));
+}
+
+int main()
+{
+    test_lifetimes();
+    test_writers();
+    test_range();
+    test_single();
+    test_list();
+    test_primes();
+    test_keys_and_values();
     test_repeat();
     test_files();
-
-    // Futures
     test_async();
-
-
-
     return 0;
 }

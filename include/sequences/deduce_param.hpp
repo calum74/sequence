@@ -4,6 +4,14 @@ namespace sequences
 {
     namespace helpers
     {
+        template<typename T>
+        struct remove_all
+        {
+            typedef typename std::remove_reference<T>::type t1;
+            typedef typename std::remove_cv<t1>::type type;
+        };
+
+
         // Deduce the type of the parameter of a lambda or functor
         // See https://stackoverflow.com/questions/2562320/specializing-a-template-on-a-lambda-in-c0x
         // See https://stackoverflow.com/questions/7943525/is-it-possible-to-figure-out-the-parameter-type-and-return-type-of-a-lambda
@@ -15,21 +23,8 @@ namespace sequences
         template<typename R, typename C, typename T>
         struct deduce_param<R(C::*)(T) const>
         {
-            typedef T type;
+            typedef typename remove_all<T>::type type;
         };
-
-        template<typename R, typename C, typename T>
-        struct deduce_param<R(C::*)(const T&) const>
-        {
-            typedef T type;
-        };
-
-        template<typename R, typename C, typename T>
-        struct deduce_param<R(C::*)(T&) const>
-        {
-            typedef T type;
-        };
-
 
         // TODO: Other function forms
 
@@ -42,25 +37,49 @@ namespace sequences
         template<typename R, typename C, typename...Args>
         struct deduce_result<R(C::*)(Args&&...) const>
         {
-            typedef R type;
+            typedef typename remove_all<R>::type type;
         };
 
         template<typename R, typename C, typename...Args>
         struct deduce_result<R(C::*)(Args...) const>
         {
-            typedef R type;
+            typedef typename remove_all<R>::type type;
         };
 
         template<typename R, typename...Args>
         struct deduce_result<R(Args...)>
         {
-            typedef R type;
+            typedef typename remove_all<R>::type type;
         };
 
         template<typename R, typename...Args>
         struct deduce_result<R(*)(Args...)>
         {
-            typedef R type;
+            typedef typename remove_all<R>::type type;
+        };
+
+        template<typename P>
+        struct project_first
+        {
+        };
+
+        template<typename T1, typename T2>
+        struct project_first<std::pair<T1,T2>>
+        {
+            typedef typename remove_all<T1>::type type;
+            const type &operator()(const std::pair<T1,T2> &p) const { return p.first; }
+        };
+
+        template<typename P>
+        struct project_second
+        {
+        };
+
+        template<typename T1, typename T2>
+        struct project_second<std::pair<T1,T2>>
+        {
+            typedef typename remove_all<T2>::type type;
+            const type &operator()(const std::pair<T1,T2> &p) const { return p.second; }
         };
 
     }

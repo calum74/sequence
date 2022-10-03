@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-int main(int argc, char**argv)
+int main(int argc, const char**argv)
 {
     // seq(argv, argc) creates a sequence that iterates over a C array
     // skip(1) skips the first element

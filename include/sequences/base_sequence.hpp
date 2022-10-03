@@ -272,6 +272,6 @@ namespace sequences
 
         repeat_sequence<Stored> repeat(int n) const { return { self(), n }; }
 
-        split_sequence<Stored> split(const T * splitChars) { return { self(), splitChars}; }
+        split_sequence<Stored> split(const T * splitChars) const { return { self(), splitChars}; }
     };
 }

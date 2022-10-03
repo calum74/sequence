@@ -27,11 +27,13 @@ namespace sequences
 
             for(auto ch = seq.first(); ch; ch = seq.next())
             {
-                if(isSplit(*ch) && !token.empty())
+                if(isSplit(*ch))
                 {
-                    return &token;
+                    if(!token.empty())
+                        return &token;
                 }
-                token += *ch;
+                else
+                    token += *ch;
             }
             eof = true;
 
@@ -48,11 +50,13 @@ namespace sequences
                 ch = seq.next();
                 if(ch)
                 {
-                    if(isSplit(*ch) && !token.empty())
+                    if(isSplit(*ch))
                     {
-                        return &token;
+                        if(!token.empty())
+                            return &token;
                     }
-                    token += *ch;
+                    else
+                        token += *ch;
                 }
             }
             while(ch);

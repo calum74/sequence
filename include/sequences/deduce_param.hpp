@@ -35,7 +35,7 @@ namespace sequences
 
         // Another helper
         template<typename Fn>
-        struct deduce_result : public deduce_result<decltype(&Fn::operator())>
+        struct deduce_result : public deduce_result<decltype(&Fn::operator())>  // Deduce the return type of functors and lambdas
         {
         };
 
@@ -51,6 +51,17 @@ namespace sequences
             typedef R type;
         };
 
+        template<typename R, typename...Args>
+        struct deduce_result<R(Args...)>
+        {
+            typedef R type;
+        };
+
+        template<typename R, typename...Args>
+        struct deduce_result<R(*)(Args...)>
+        {
+            typedef R type;
+        };
 
     }
 }

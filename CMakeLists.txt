@@ -19,6 +19,7 @@ add_executable(writers samples/writers.cpp)
 add_executable(transformations samples/transformations.cpp)
 add_executable(benchmarks test/benchmarks.cpp)
 add_executable(primes samples/primes.cpp)
+add_executable(csvreader samples/csvreader.cpp)
 
 enable_testing()
 add_test(Unit-tests test_sequence)

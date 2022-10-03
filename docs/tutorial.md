@@ -142,13 +142,55 @@ The performance characteristics of these functions is O(1) with the exceptions:
 * `back()` is O(1) or O(n)
 * `at(n)` is O(1) or O(`n`)
 
+`front()`, `back()` and `at()` always throw `std::out_of_bounds` if the sequence doesn't contain a value at the given position.
+
 Sequences are not modifiable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Transformaing sequences](#transforming-sequences) on how to do this.
 
 Sequences can only be iterated in the forwards direction, so `rbegin()` and `rend()` are not supported.
 
+## Writing sequences to containers
+
+There will come a time when you need to store the result of a sequence. To do this, any regular C++ container would be used, and the type of container depends on how you intend to use it. There are a number of ways to write a sequence `s` to a container `vec`:
+
+```c++
+    // Pass the sequence into the constructor
+    std::vector<std::string> vec { s.begin(), s.end() };
+
+    // Create a generic writer to copy the contents to
+    writer(vec) << s;
+
+    // Copy the sequence to an existing container (using vec.insert())
+    s.copy_to(vec);
+
+    // Construct a new container of the given type.
+    auto vec = s.make<std::vector<std::string>>(); 
+```
+
+`writer()` is an adapter (similar to `seq()`) that constructs a universal output sequence wrapping any implementation in a consistent interface.
+
 ## Operations
 
-In addition to 
+Sequences support a standard set of operations in addition to being regular C++ containers.
+
+`bool any()` returns true if the sequence contains items. Supplying a predicate function returns if the sequence contains at least one item matching the predicate. This is more efficient than `size()` or `count()` which would need to iterate the entire sequence.
+
+```c++
+    if(s.any())
+        std::cout << "The sequence is not empty\n";
+
+    if(s.any([](int value) { return value>1000; }))
+        std::cout << "One of the values is > 1000\n";
+```
+
+`size_type count(Predicate p)` returns the number of items matching a given predicate. For example
+
+```c++
+    std::cout << "There are " << s.count([](int value) { return value>1000; })) << " items>1000\n";
+```
+
+`value_type front_or_default(const value_type & d)`, `value_type back_or_default(const value_type & d)` return a default value
+
+
 
 `bool any()`, `bool any(Pred p)`
 This is more efficient than `size()>0` because it only needs to check the first item.
@@ -198,6 +240,17 @@ Sequences can be stored in `auto` stack objects, for example
 
     for(auto opt : options)
         ...
+```
+
+Sequences are only as thread-safe as the collections they are iterating. Generally, this offers very few guarantees, and it is a bad idea to modify the contents of a sequence you are currently iterating. If the underlying data is `const` then multiple sequences (in possibly different threads) will not interfere and can read the data safely. The same sequence must not be iterated reentrantly or in multiple threads.
+
+To avoid these problems, simply create a new sequence in each thread, and do not pass references to sequences (`const sequence<T>&`) between threads.
+
+As an example
+
+```c++
+    TODO
+    std::future
 ```
 
 ## Passing sequences to functions
@@ -296,16 +349,19 @@ TODO: Test with maps and sets.
     getItems(receiver([](const std::string & str) { std::cout << "The item was " << str << std::endl; }));
 ```
 
-This design is safe and efficient. There is an overhead of one virtual function call per element of the sequence, with the benefits of a simpler and more generic implementation. Virtual function calls can be avoided if you use templates (see the section on [performance-considerations].)
+This design is safe and efficient. There is an overhead of one virtual function call per element of the sequence, with the benefits of a simpler and more generic implementation. Virtual function calls can be avoided if you use templates (see the section on [#performance].)
 
 ## Transforming sequences
 
-## String processing
+## String and stream processing
 
-Sequences have another trick up their sleeve, which is the ability to read files and tokenize strings and streams.
+Sequences have another trick up their sleeve, which is the ability to read files and tokenize strings and streams. `seq(stream)` creates a sequence of the characters in the stream.
+
+The `split()` function converts a stream of characters into
 
 ```c++
-
+    std::ifstream file("data.txt");
+    auto rows = seq(file).split("\n");
 ```
 
 ## Performance
@@ -347,6 +403,8 @@ From the disassembly of
 
 we see that the compiler has been able to optimize the code quite well.
 
+Similarly, `writer` is a zero-overhead abstraction that only incurs additional virtual function calls when crossing function boundaries using `const output_sequence<T>&`.
+
 ### pointer_sequence
 
 Functions can use `const pointer_sequence<T> &` which is a more restricted sequence type, for more performance. This sequence type is stored as a pair of pointers `const T*`, so is suitable for the contents of a `std::vector` for example, and supports all regular sequence methods. Of course, the caller then needs to create the array in the first place which is not necessarily convenient or efficient.
@@ -364,4 +422,4 @@ template<typename Seq>
 void setItems(Seq seq);
 ```
 
-Unless you're sure you need the performace, it's probably not worth it.
+Unless you're sure you need the performance, it's probably not worth it.

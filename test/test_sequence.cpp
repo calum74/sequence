@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <fstream>
+#include <sstream>
 
 #undef NDEBUG
 #include <cassert>
@@ -123,7 +124,6 @@ void test_repeat()
 
 void test_files()
 {
-    const char * filename = "../test/test1.txt";
     std::ifstream file("../test/test1.txt");
 
     auto chars = seq(file);
@@ -137,6 +137,9 @@ void test_files()
     file.clear();
     file.seekg(0);
     assert(seq(file).split("\n") == list("abc","def","This is line 3"));
+
+    std::stringstream ss("abc\ndef\r\n   ghi   \n\n");
+    assert(seq(ss).split("\r\n") == list("abc","def","   ghi   "));
 }
 
 int main()

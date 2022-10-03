@@ -20,7 +20,7 @@ void processFiles(const sequence<std::pair<char, std::string>> & options, const 
         std::cout << "Open file " << file << std::endl;
 }
 
-int main(int argc, char**argv)
+int main(int argc, const char**argv)
 {
     // Define a sequence that convert the arguments to a list of std::string,
     // skipping argv[0] which is the program itself

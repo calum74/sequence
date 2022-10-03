@@ -3,6 +3,7 @@
 #include <sequence.hpp>
 #include <iostream>
 #include <vector>
+#include <sstream>
 
 void print(const sequence<const char*> & items)
 {
@@ -40,6 +41,10 @@ int main()
 
     // Create a sequence of characters in a C string
     std::cout << seq("Bergerac").size() << std::endl;
+
+    // Create a sequence of characters from a stream
+    std::stringstream ss("a b c");
+    std::cout << seq(ss).front() << std::endl;
 
     return 0;
 }

@@ -11,6 +11,7 @@
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <future>
 
 #undef NDEBUG
 #include <cassert>
@@ -142,6 +143,41 @@ void test_files()
     assert(seq(ss).split("\r\n") == list("abc","def","   ghi   "));
 }
 
+// This function should return 0, but actually does not because
+// sum() is iterating over the same sequence concurrently which is
+// undefined.
+int computeAsyncUnsafe(const sequence<int> & values) {
+    auto f1 = std::async(std::launch::async, [&]() { return values.sum(); });
+    auto f2 = std::async(std::launch::async, [&]() { return values.sum(); });
+    return f1.get() - f2.get();
+}
+
+// A safe version of computeAsyncUnsafe(), ensuring that the sequence
+// is copied by value.
+template<typename Seq>
+int computeAsyncSafe1(const Seq & values) {
+    auto f1 = std::async(std::launch::async, [=]() { return values.sum(); });
+    auto f2 = std::async(std::launch::async, [=]() { return values.sum(); });
+    return f1.get() - f2.get();
+}
+
+// A safe version of computeAsyncUnsafe(), ensuring that the sequence
+// is copied by value.
+int computeAsyncSafe2(const pointer_sequence<int> & values) {
+    auto f1 = std::async(std::launch::async, [=]() { return values.sum(); });
+    auto f2 = std::async(std::launch::async, [=]() { return values.sum(); });
+    return f1.get() - f2.get();
+}
+
+void test_async()
+{
+    std::cout << computeAsyncUnsafe(seq(1,10000000)) << std::endl;
+    std::cout << computeAsyncSafe1(seq(1,10000000)) << std::endl;
+
+    auto values = seq(1,1000000).make<std::vector<int>>();
+    std::cout << computeAsyncSafe2(seq(values)) << std::endl;
+}
+
 int main()
 {
     test_lifetimes();
@@ -251,6 +287,11 @@ int main()
 
     test_repeat();
     test_files();
+
+    // Futures
+    test_async();
+
+
 
     return 0;
 }

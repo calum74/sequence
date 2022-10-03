@@ -11,9 +11,9 @@ Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.c
 
 ## What is a sequence?
 
-A _sequence_ is just a series of elements, that can even be infinite. Sequences can be used in any situation where a list or collection is required, and replaces the car crash of alternatives in C++ with something simpler and more powerful.
+A _sequence_ is simply a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simpler and more powerful.
 
-Sequences can only be iterated in the forwards direction. They are C++ sequential containers, with an input iterator type.
+Sequences can only be iterated in the forwards direction. Sequences are C++ sequential containers, with an input iterator type.
 
 Sequences are lightweight wrappers over some underlying collection, that provide a consistent interface across a range of underlying implementations, and imbue collections with additional functionality in a consistent way.
 
@@ -24,33 +24,6 @@ In the following example, we do not actually create an array of 1 billion intege
 ```c++
     int count = seq(1,1000000000).where([](int n) { return n%2==0; }).size();
 ```
-We can from the disassembly of the code that the compiler has done a reasonable job of optimizing this.
-
-<details>
-<summary>Expand for disassembly
-</summary>
-
-```
-0000000100001f94 <__Z13do_benchmark2v>:
-100001f94: 0b 00 80 52 	mov	w11, #0
-100001f98: 09 00 80 52 	mov	w9, #0
-100001f9c: 00 00 80 52 	mov	w0, #0
-100001fa0: 28 40 99 52 	mov	w8, #51713
-100001fa4: 48 73 a7 72 	movk	w8, #15258, lsl #16
-100001fa8: 03 00 00 14 	b	0x100001fb4 <__Z13do_benchmark2v+0x20>
-100001fac: 4b 7d 0a 1b 	mul	w11, w10, w10
-100001fb0: e9 03 0a aa 	mov	x9, x10
-100001fb4: 00 00 0b 0b 	add	w0, w0, w11
-100001fb8: 2a 05 00 11 	add	w10, w9, #1
-100001fbc: 5f 01 08 6b 	cmp	w10, w8
-100001fc0: a0 00 00 54 	b.eq	0x100001fd4 <__Z13do_benchmark2v+0x40>
-100001fc4: 4a ff 07 36 	tbz	w10, #0, 0x100001fac <__Z13do_benchmark2v+0x18>
-100001fc8: 2a 09 00 11 	add	w10, w9, #2
-100001fcc: 5f 01 08 6b 	cmp	w10, w8
-100001fd0: e1 fe ff 54 	b.ne	0x100001fac <__Z13do_benchmark2v+0x18>
-100001fd4: c0 03 5f d6 	ret
-```
-</details>
 
 ## Your first sequence
 
@@ -81,12 +54,13 @@ The `seq()` function is used to create sequences for a variety of situations. It
 
 5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range a-b.
 
+6. `seq(std::basic_istream<T> &)` returns a sequece that iterates the streambuf of a stream.
 
-All of these operations are O(1) and efficient. All they really do is wrap the underlying collection in a different type.
+7. `list(...)` creates a sequence of the given elements.
 
-The return type of `seq` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &`.
+All of these operations are O(1) and efficient. All they really do is wrap the underlying collection with a different interface.
 
-As a simple example, this `seq()` function wraps a `vector` to create a sequence:
+The return type of `seq` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &` argument.
 
 The example [creation.cpp](../samples/creation.cpp) shows the various ways that sequences can be created:
 
@@ -121,56 +95,34 @@ The example [creation.cpp](../samples/creation.cpp) shows the various ways that 
     std::cout << seq("Bergerac").size() << std::endl;
 ```
 
-Lists are created using the `list()` function.  A list is just another type of sequence, but this does copy its elements into an internal fixed-length array. `list()` is variadic, taking any number of arguments.
+Lists are created using the `list()` function.  A list is just another type of sequence. `list()` is variadic, taking any number of arguments.
 
-Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()` and `as()`. We will talk about these in [Transforming Sequences](#transforming-sequences).
+Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()`, `as()` and `merge()`. We will talk about these in [Transforming Sequences](#transforming-sequences).
 
 ## Using sequences as containers
 
-Sequences behave mostly like normal C++ containers, so can for example just be iterated:
+Sequences are C++ containers, so can for example just be iterated:
 
 ```c++
     for(auto animal : list("dog", "cat"))
         ...
 ```
 
-The normal container functions are supported, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()` etc.
+Sequences support the normal container functions, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()` etc.
 
-The performance characteristics of these functions is O(1) with the exceptions:
+The performance characteristics of these functions are O(1) with the exceptions:
 
 * `size()` is O(1) or O(n)
 * `back()` is O(1) or O(n)
 * `at(n)` is O(1) or O(`n`)
 
-`front()`, `back()` and `at()` always throw `std::out_of_bounds` if the sequence doesn't contain a value at the given position.
+`front()`, `back()` and `at()` throw `std::out_of_bounds` if the sequence doesn't contain a value at the given position.
 
 Sequences are not modifiable, so you cannot alter an existing sequence or change the contents of it. To do that, you need to modify the underlying container. The other way to modify a sequence is to create a new sequence that adapts an existing sequence - see [Transformaing sequences](#transforming-sequences) on how to do this.
 
 Sequences can only be iterated in the forwards direction, so `rbegin()` and `rend()` are not supported.
 
-## Writing sequences to containers
-
-There will come a time when you need to store the result of a sequence. To do this, any regular C++ container would be used, and the type of container depends on how you intend to use it. There are a number of ways to write a sequence `s` to a container `vec`:
-
-```c++
-    // Pass the sequence into the constructor
-    std::vector<std::string> vec { s.begin(), s.end() };
-
-    // Create a generic writer to copy the contents to
-    writer(vec) << s;
-
-    // Copy the sequence to an existing container (using vec.insert())
-    s.copy_to(vec);
-
-    // Construct a new container of the given type.
-    auto vec = s.make<std::vector<std::string>>(); 
-```
-
-`writer()` is an adapter (similar to `seq()`) that constructs a universal output sequence wrapping any implementation in a consistent interface.
-
 ## Operations
-
-Sequences support a standard set of operations in addition to being regular C++ containers.
 
 `bool any()` returns true if the sequence contains items. Supplying a predicate function returns if the sequence contains at least one item matching the predicate. This is more efficient than `size()` or `count()` which would need to iterate the entire sequence.
 
@@ -182,36 +134,27 @@ Sequences support a standard set of operations in addition to being regular C++ 
         std::cout << "One of the values is > 1000\n";
 ```
 
-`size_type count(Predicate p)` returns the number of items matching a given predicate. For example
+`count(Predicate p)` returns the number of items matching a given predicate. For example
 
 ```c++
     std::cout << "There are " << s.count([](int value) { return value>1000; })) << " items>1000\n";
 ```
 
-`value_type front_or_default(const value_type & d)`, `value_type back_or_default(const value_type & d)` return a default value
+`value_type front_or_default(const value_type & d)`, `value_type back_or_default(const value_type & d)` return a default value if the sequence is empty.
 
-
-
-`bool any()`, `bool any(Pred p)`
-This is more efficient than `size()>0` because it only needs to check the first item.
-
-front_or_default
-back_or_default
-
-size_type count(Pred)
-
-aggregate
-sum
-
-write_to(vec)
-
-Example: hashing a sequence
+`sum()` returns the sum of all elements, and concatenates strings if the elements are `std::string`. `aggregate()` performs a more general aggregation, starting with the initial value (in the first argument), and applying a function successively. This example computes a hash:
 
 
 ```c++
-    int hash = s.aggregate([](int n1, int n2) { return n1*13 + n2; })
+    // Simple hash of a sequence of integers
+    int hash = s.aggregate(0, [](int n1, int n2) { return n1*13 + n2; });
 ```
 
+`accumulate()` works very similarly to `aggregate`, but the function uses a different signature which could be more efficient in some circumstances:
+
+```c++
+    fasterSum = chars.accumulate(std::string(), [](std::string & str, char c) { str+=c; });
+```
 
 ## Comparing sequences
 
@@ -223,35 +166,74 @@ Example:
     assert(seq(1,3)==list(1,2,3));
 ```
 
-## Sequence lifetime
+## Transforming sequences
 
-Sequences should only be created on the stack as short-lived temporary objects. (This is a slight departure from C#, where a field of type `IEnumerable<T>` is permitted.)
+A sequence "transformation" adapts an existing sequence, leaving the original sequence unmodified.  Sequences provide a "fluent" API (similar to `IEnumerable<>`) to allow transformations to be easily composed.
 
-The reason for this is to avoid the dangers of invalid iterators or references. Recall that sequences are lightweight wrappers, so if the underlying data goes out of scope then the sequence is undefined and the program will crash.
+Transformations are generally executed in a streaming way, processing one element at a time. The "creation" of a transformation means to define a new stream, but it does not actually process any elements.
 
-Long term storage of sequence data should always be done using a C++ container.
-
-Sequences can be stored in `auto` stack objects, for example
+For example the following code is efficient in that it doesn't create any arrays or iterate past the first element:
 
 ```c++
-    auto options = params.
-        where([](const char * arg) { return arg[0]=='-'; }).
-        select([](const char * arg) { return arg+1; });
-
-    for(auto opt : options)
-        ...
+    auto s1 = seq(1,1000000000);
+    auto s2 = s1.where([](int n) { return n%2==0; });
+    auto s3 = s2.select([](int n) { return n*n; });
+    bool b = s3.any();
 ```
 
-Sequences are only as thread-safe as the collections they are iterating. Generally, this offers very few guarantees, and it is a bad idea to modify the contents of a sequence you are currently iterating. If the underlying data is `const` then multiple sequences (in possibly different threads) will not interfere and can read the data safely. The same sequence must not be iterated reentrantly or in multiple threads.
+The data types of `s1`, `s2` and `s3` are unspecified but they are stack objects.
 
-To avoid these problems, simply create a new sequence in each thread, and do not pass references to sequences (`const sequence<T>&`) between threads.
+The `where()` transformation filters an existing sequence, returning a sequence with a subset of the original sequence. The `select()` transformation returns a sequence of the original size, but each element is computed based on a function or lambda.
 
-As an example
+As a special case of `select()`, the `as<>()` transformation performs a cast of each element to a new type.
 
 ```c++
-    TODO
-    std::future
+    auto args = seq(argv, argc).skip(1).as<std::string>();
 ```
+
+`take(int n)` creates a sequence of at most `n` elements - any additional elements are removed. `skip(int n)` creates a sequence where the first `n` elements have been removed.
+
+These could be combined to create a sequence of a specified range, for example:
+
+```c++
+    auto s2 = s1.skip(10).take(5);
+```
+
+`skip_until()` and `take_while()` can be used to `skip` and `take` based on the data in the sequence rather than a fixed number.
+
+`repeat(int n)` is used to repeat a sequence 0 or more times.
+
+```c++
+    auto s = list('a','b').repeat(500);
+```
+
+`merge` is used to combine (or "zip") two sequences of the same length. This takes an item from each list and passes them to a functor that combines them into one element. For example
+
+```c++
+    auto records = names.merge(addresses, [](const std::string &name, const std::string & address) { return Person{name, address}; });
+```
+
+## Writing sequences
+
+Sequences don't actually store any data, so should copy their contents into a regular C++ container as needed. Then, when the container needs to be queried again, it can again be wrapped in a sequence using `seq`.
+
+There are a number of ways to write a sequence `s` to a container `vec`:
+
+```c++
+    // Pass the sequence into the constructor
+    std::vector<std::string> vec { s.begin(), s.end() };
+
+    // Create a generic writer to copy the contents to
+    writer(vec) << s;
+
+    // Copy the sequence to an existing container (using vec.insert())
+    s.write_to(vec);
+
+    // Construct a new container of the given type
+    auto vec = s.make<std::vector<std::string>>(); 
+```
+
+`writer()` is an adapter (similar to `seq()`) that constructs a universal output sequence wrapping any implementation in a consistent interface. `writer()` is particularly useful to create output sequences which are necessary when returning sequences from functions (see next section.)
 
 ## Passing sequences to functions
 
@@ -284,7 +266,7 @@ and also different possible ways of returning lists:
 
 The drawback with all of these approaches is that they are incompatible - you need to pick a representation up front, provide multiple implementations, or implement your code in header files. They are not always efficient either - sometimes it's just not necessary to store the data in a container, and there is overhead in creating a list in a different container to the one you already have.
 
-_Sequence_ replaces these methods with the much simpler
+Using sequences these methods can be written with the much simpler `sequence<T>` and `output_sequence<T>`:
 
 ```c++
     void setItems(const sequence<std::string> & items);
@@ -341,8 +323,6 @@ Output sequences are typically lambdas or write to containers. `writer()` is use
 
 This provides a uniform way to add data to any container as determined by the caller, not the callee. The `getItems()` function could equally work with a `std::list<std::string>` or a `std::unordered_set<std::string>` or any other suitable container.
 
-TODO: Test with maps and sets.
-
 `receiver()` is used to pass the elements to a lambda:
 
 ```c++
@@ -351,17 +331,72 @@ TODO: Test with maps and sets.
 
 This design is safe and efficient. There is an overhead of one virtual function call per element of the sequence, with the benefits of a simpler and more generic implementation. Virtual function calls can be avoided if you use templates (see the section on [#performance].)
 
-## Transforming sequences
-
 ## String and stream processing
 
 Sequences have another trick up their sleeve, which is the ability to read files and tokenize strings and streams. `seq(stream)` creates a sequence of the characters in the stream.
 
-The `split()` function converts a stream of characters into
+The `split()` function converts a sequence of characters into a sequence of `std::string`.
 
 ```c++
     std::ifstream file("data.txt");
-    auto rows = seq(file).split("\n");
+    auto rows = seq(file).split("\r\n");
+```
+
+## Sequence lifetime
+
+Sequences should only be created on the stack as short-lived temporary objects. (This is a slight departure from C#, where a field of type `IEnumerable<T>` is permitted.)
+
+The reason for this is to avoid the dangers of invalid iterators or references. Recall that sequences are lightweight wrappers, so if the underlying data goes out of scope then the sequence is undefined and the program will crash.
+
+Long term storage of sequence data should always be done using a C++ container.
+
+Sequences can be stored in `auto` stack objects, for example
+
+```c++
+    auto options = params.
+        where([](const char * arg) { return arg[0]=='-'; }).
+        select([](const char * arg) { return arg+1; });
+
+    for(auto opt : options)
+        ...
+```
+
+Sequences are only as thread-safe as the collections they are iterating. Generally, this offers very few guarantees, and it is a bad idea to modify the contents of a sequence you are currently iterating. If the underlying data is `const` then multiple sequences (in possibly different threads) will not interfere and can read the data safely. The same sequence must not be iterated reentrantly or in multiple threads.
+
+To avoid these problems, simply create a new sequence in each thread, and do not pass references to sequences (`const sequence<T>&`) between threads.
+
+As an example, `computeAsyncUnsafe()` exhibits undefined behaviour because the underlying sequence is iterated concurrently.
+
+```c++
+// This function should return 0, but actually does not because
+// sum() is iterating over the same sequence concurrently which is
+// undefined.
+int computeAsyncUnsafe(const sequence<int> & values) {
+    auto f1 = std::async(std::launch::async, [&]() { return values.sum(); });
+    auto f2 = std::async(std::launch::async, [&]() { return values.sum(); });
+    return f1.get() - f2.get();
+}
+```
+
+The solution is to always capture the sequence by value (`[=]() { return values.sum(); }`), but this means changing the function signature to a type that can be copied by value, for example
+
+```c++
+// A safe version of computeAsyncUnsafe(), ensuring that the sequence
+// is copied by value.
+template<typename Seq>
+int computeAsyncSafe1(const Seq & values) {
+    auto f1 = std::async(std::launch::async, [=]() { return values.sum(); });
+    auto f2 = std::async(std::launch::async, [=]() { return values.sum(); });
+    return f1.get() - f2.get();
+}
+
+// A safe version of computeAsyncUnsafe(), ensuring that the sequence
+// is copied by value.
+int computeAsyncSafe2(const pointer_sequence<int> & values) {
+    auto f1 = std::async(std::launch::async, [=]() { return values.sum(); });
+    auto f2 = std::async(std::launch::async, [=]() { return values.sum(); });
+    return f1.get() - f2.get();
+}
 ```
 
 ## Performance
@@ -421,5 +456,3 @@ to avoid the overheads of function calls completely, we can template the functio
 template<typename Seq>
 void setItems(Seq seq);
 ```
-
-Unless you're sure you need the performance, it's probably not worth it.

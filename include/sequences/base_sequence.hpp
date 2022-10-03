@@ -120,8 +120,6 @@ namespace sequences
             return value;
         }
 
-
-        // TODO: Rename this
         const value_type &front() const
         {
             auto c = self().first();

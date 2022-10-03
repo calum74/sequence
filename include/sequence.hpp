@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstring>
+#include <vector>
 #include "sequence_fwd.hpp"
 #include "sequences/fwd.hpp"
 #include "sequences/deduce_param.hpp"
@@ -109,13 +110,18 @@ pointer_sequence<Ch> seq(const std::basic_string<Ch> & str) {
     return {str.data(), str.data()+str.size() };   
 }
 
-/*
 template<typename T, typename Alloc>
 pointer_sequence<T> seq(const std::vector<T, Alloc> & vec)
 {
     return { vec.data(), vec.data()+vec.size() };
 }
-*/
+
+template<typename T, typename Alloc>
+pointer_sequence<T> seq(std::vector<T, Alloc> & vec)
+{
+    return { vec.data(), vec.data()+vec.size() };
+}
+
 
 // This is really problematic!
 // stored_sequences are pretty slow

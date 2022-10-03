@@ -46,3 +46,12 @@ words.join() - same as sum()
 words.join(" ") - Constructs a string with spaces.
 
 
+It would be great if the following code worked:
+
+
+```
+void setItems(const sequence<std::string> & items);
+
+std::vector<std::string> vec;
+setItems(vec);
+```

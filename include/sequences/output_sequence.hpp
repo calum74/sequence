@@ -1,5 +1,3 @@
-#include "deduce_param.hpp"
-
 template<typename T>
 class output_sequence
 {

@@ -114,6 +114,40 @@ void test_repeat()
     assert(list<int>()==list(1).repeat(0));
     assert(list<int>()==list<int>().repeat(2));
     assert(list<int>()==list<int>().repeat(0));
+
+    // Invalid input
+    assert(list('a').repeat(-1) == list<char>());
+}
+
+void test_take()
+{
+    assert(list(1,2,3,4).take(-1)==list<int>());
+    assert(list(1,2,3,4).take(0)==list<int>());
+    assert(list(1,2,3,4).take(1)==list<int>(1));
+    assert(list(1,2,3,4).take(2)==list<int>(1,2));
+    assert(list(1,2,3,4).take(3)==list<int>(1,2,3));
+    assert(list(1,2,3,4).take(4)==list<int>(1,2,3,4));
+    assert(list(1,2,3,4).take(5)==list<int>(1,2,3,4));
+}
+
+void test_skip()
+{
+    assert(list(1,2,3,4).skip(-1)==list<int>(1,2,3,4));
+    assert(list(1,2,3,4).skip(0)==list<int>(1,2,3,4));
+    assert(list(1,2,3,4).skip(1)==list<int>(2,3,4));
+    assert(list(1,2,3,4).skip(2)==list<int>(3,4));
+    assert(list(1,2,3,4).skip(3)==list<int>(4));
+    assert(list(1,2,3,4).skip(4)==list<int>());
+    assert(list(1,2,3,4).skip(5)==list<int>());
+}
+
+void test_take_while()
+{
+}
+
+void test_skip_until()
+{
+
 }
 
 void test_files()
@@ -246,9 +280,7 @@ void test_comparisons()
 
 void test_single()
 {
-    auto d = single(3);
-
-    assert(d.size()==1);
+    assert(single(3)==list(3));
 }
 
 void test_list()
@@ -325,13 +357,75 @@ void test_generator()
 
 void test_keys_and_values()
 {
-    // TODO: Iterate the keys() or values()
-    // Example: iterate the keys or values in a map
     std::map<std::string, int> map1 = { {"a",1}, {"b",2}, {"c",3}};
 
-    assert(seq(map1).keys().size()==3);
     assert(seq(map1).keys() == list("a","b","c"));
     assert(seq(map1).values() == list(1,2,3));
+
+    assert(seq(map1).keys().merge(seq(map1).values(), [](const std::string & str, int i) { return std::make_pair(str,i);}) == seq(map1));
+}
+
+void test_merge()
+{
+    auto sum = [](int a, int b) { return a+b; };
+    auto e = list<int>();
+
+    assert(list(1,2).merge(list(3,4), sum) == list(4,6));
+    assert(e.merge(list(3,4), sum) == e);
+    assert(list(1,2).merge(e, sum) == e);
+
+    assert(list(1).merge(list(3,4), sum) == list(4));
+    assert(list(1,2).merge(list(3), sum) == list(4));
+}
+
+void test_sum()
+{
+    assert(list<int>().sum()==0);
+    assert(list(1).sum() == 1);
+    assert(list(1,2,3).sum() == 6);
+
+    assert(list<std::string>().sum() == "");
+    assert(list<std::string>("a", "b", "c").sum() == "abc");
+
+    assert(list(0.5, 1.5).sum() == 2.0);
+}
+
+void test_any()
+{
+    assert(!list<int>().any());
+    assert(list<int>().empty());
+    assert(list(1).any());
+    assert(!list(1).empty());
+
+    assert(!list(1,2).any([](int x) { return x==3; }));
+    assert(list(1,2).any([](int x) { return x==2; }));
+}
+
+void test_count()
+{
+    assert(list<int>().count([](int x) { return x==1; })==0);
+    assert(list<int>(2,3).count([](int x) { return x==1; })==0);
+    assert(list<int>(1,2,3).count([](int x) { return x==1; })==1);
+    assert(list<int>(1,2,3,1,1).count([](int x) { return x==1; })==3);
+}
+
+void test_aggregate()
+{
+    auto sum = [](int a, int b) { return a+b; };
+
+    assert(list<int>().aggregate(0, sum)==0);
+    assert(list<int>().aggregate(1, sum)==1);
+    assert(list(3,4,5).aggregate(2, sum)==14);
+    assert(list(3,4,5).aggregate(sum)==12);
+    assert(list(3,4,5).aggregate(std::string(), [](const std::string & str, int n) { return str+'x'; })=="xxx");
+
+}
+
+void test_accumulate()
+{
+    assert(list<int>().accumulate(5, [](int & total, int n) { total+=n; })==5);
+    assert(list(3,4,5).accumulate(5, [](int & total, int n) { total+=n; })==17);
+    assert(list(3,4,5).accumulate(std::string(), [](std::string & str, int n) { str+='x'; })=="xxx");
 }
 
 int main()
@@ -347,5 +441,15 @@ int main()
     test_repeat();
     test_files();
     test_async();
+    test_take();
+    test_skip();
+    test_take_while();
+    test_skip_until();
+    test_merge();
+    test_sum();
+    test_any();
+    test_count();
+    test_aggregate();
+    test_accumulate();
     return 0;
 }

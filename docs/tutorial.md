@@ -95,7 +95,11 @@ The example [creation.cpp](../samples/creation.cpp) shows the various ways that 
     std::cout << seq("Bergerac").size() << std::endl;
 ```
 
-Lists are created using the `list()` function.  A list is just another type of sequence. `list()` is variadic, taking any number of arguments.
+Lists are created using the `list()` function.  A list is just another type of sequence. `list()` is variadic, taking any number of arguments. The template parameter can be specified explicitly to coerce the list to a given type, for example this is a sequence of type `std::string`:
+
+```c++
+    auto l = list<std::string>("cat", "dog");
+```
 
 Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()`, `as()` and `merge()`. We will talk about these in [Transforming Sequences](#transforming-sequences).
 

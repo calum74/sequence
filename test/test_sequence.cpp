@@ -143,11 +143,16 @@ void test_skip()
 
 void test_take_while()
 {
+    assert(list(1,2,3,4).take_while([](int x) { return false; }) == list<int>());
+    assert(list(1,2,3,4,1).take_while([](int x) { return x<=3; }) == list(1,2,3));
+    assert(list(1,2,3,4).take_while([](int x) { return true; }) == list(1,2,3,4));
 }
 
 void test_skip_until()
 {
-
+    assert(list(1,2,3,4).skip_until([](int x) { return false; }) == list<int>());
+    assert(list(1,2,3,4,1).skip_until([](int x) { return x>=3; }) == list(3,4,1));
+    assert(list(1,2,3,4).skip_until([](int x) { return true; }) == list(1,2,3,4));
 }
 
 void test_files()

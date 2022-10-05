@@ -10,6 +10,8 @@ Tidy up the unit tests
 
 Tidy up the code
 
+Actions to run PRs and generate benchmarks
+
 ## Milestone 2
 
 Reference manual

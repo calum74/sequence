@@ -157,20 +157,6 @@ void test_skip_until()
 
 void test_files()
 {
-    std::ifstream file("../test/test1.txt");
-
-    auto chars = seq(file);
-    assert(chars.size()==22);
-
-    // Next, split file into lines
-    file.clear();
-    file.seekg(0);
-    assert(seq(file).size()==22);
-
-    file.clear();
-    file.seekg(0);
-    assert(seq(file).split("\n") == list("abc","def","This is line 3"));
-
     std::stringstream ss("abc\ndef\r\n   ghi   \n\n");
     assert(seq(ss).split("\r\n") == list("abc","def","   ghi   "));
 }

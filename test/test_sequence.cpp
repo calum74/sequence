@@ -208,7 +208,7 @@ void test_async()
     std::cout << computeAsyncSafe1(seq(1,10000000)) << std::endl;
 
     auto values = seq(1,1000000).make<std::vector<int>>();
-    std::cout << computeAsyncSafe2(seq(values)) << std::endl;
+    std::cout << computeAsyncSafe1(seq(values)) << std::endl;
 }
 
 void test_range()

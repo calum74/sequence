@@ -1,6 +1,3 @@
-#include <iterator>
-#include <stdexcept>
-
 namespace sequences
 {
     template<typename T, typename Derived, typename Stored=Derived>

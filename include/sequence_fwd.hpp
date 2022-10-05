@@ -1,3 +1,6 @@
+// Forward declarations for sequences
+// Include this file in header files to for function signatures using sequences.
+
 #pragma once
 
 template<typename T> class sequence;

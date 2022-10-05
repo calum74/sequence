@@ -11,7 +11,7 @@ Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.c
 
 ## What is a sequence?
 
-A _sequence_ is simply a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simple and powerful.
+A _sequence_ is just a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simple and powerful.
 
 Sequences can only be iterated in the forwards direction. Sequences are C++ sequential containers, with an input iterator type.
 
@@ -52,13 +52,13 @@ The `seq()` function is used to create sequences from a variety of data sources.
 
 4. `seq(const char* str)` returns the sequence of characters in the null-terminated C-style string `str`.
 
-5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range a to b.
+5. `seq(int a, int b)` returns a sequence of integers, in the inclusive range `a` to `b`.
 
-6. `seq(std::basic_istream<T> &)` returns a sequece that iterates the streambuf of a stream.
+6. `seq(std::basic_istream<T> &)` returns a sequece that iterates the `streambuf` of a stream.
 
 7. `list(...)` creates a sequence of the given elements.
 
-All of these operations are lightweight and efficient, and do not iterate the underlying data until asked to do so.
+All of these operations are lightweight and efficient, and do not iterate the underlying data until needed.
 
 The return type of `seq` is unspecified, but it can be stored in an `auto` variable, iterated using a `for` loop, or passed to a function taking a `const sequence<T> &` argument.
 
@@ -112,7 +112,7 @@ Sequences are C++ containers, so can for example just be iterated:
         ...
 ```
 
-Sequences support normal container functions, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()` etc.
+Sequences support many normal container functions, such as `begin()`, `end()`, `empty()`, `size()`, `front()`, `back()`, `at()`, comparators etc.
 
 The performance characteristics of these functions are O(1) with the exceptions:
 
@@ -128,14 +128,14 @@ Sequences can only be iterated in the forwards direction, so `rbegin()` and `ren
 
 ## Operations
 
-Sequences support a few extra operations not found on normal containers:
+Sequences provide extra operations not found on normal containers:
 
 * `any()` - tests if the sequence contains any element / element matching a predicate
 * `count()` - counts the number of elements matching a predicate
 * `value_type front_or_default(const value_type&)`, `back_or_default()` - 
 * `at()` - gets an element at a given position
 * `sum()` - sums all of the elements
-* `aggregate()`, `accumulate()` - runs an arbitrary function ver all elements and computes a result
+* `aggregate()`, `accumulate()` - runs an arbitrary function over all elements and computes a result
 
 See [transformations.cpp](samples/transformations.cpp) for examples on how to use these functions.
 
@@ -187,19 +187,9 @@ See [transformations.cpp](samples/transformations.cpp) for examples on how to us
 
 ```
 
-## Comparing sequences
-
-Sequences support comparison operators, `==`, `!=`, `<`, `>`, `<=`, `>=`. These perform memberwise equality and lexographical comparison. A comparator can be passed to the `equals()` and `lexographical_compare()` methods in case you need something other than the default `==` and `<` operators.
-
-Example:
-
-```c++
-    assert(seq(1,3)==list(1,2,3));
-```
-
 ## Transforming sequences
 
-A sequence "transformation" adapts an existing sequence, leaving the original sequence unmodified.  Sequences provide a "fluent" API (similar to `IEnumerable<>`) to allow transformations to be easily composed.
+A sequence "transformation" adapts an existing sequence, leaving the original sequence unmodified.  Sequences provide a "fluent" API (similar to C# `IEnumerable<>`) to allow transformations to be easily composed.
 
 Transformations are generally executed in a streaming way, processing one element at a time. The "creation" of a transformation means to define a new stream, but it does not actually process any elements.
 
@@ -332,10 +322,10 @@ Using sequences these methods can be written with the much simpler `sequence<T>`
 ```
 ### Passing sequences into functions
 
-Functions can use a `const sequence<std::string>&` paramter to receive a sequence. This just behaves as you would imagine:
+Functions can use a `const sequence<std::string>&` parameter to receive a sequence. For example,
 
 ```c++
-    // Somewhere we store the items
+    // Somewhere to store the items
     std::vector<std::string> my_items;
 
     // A method that receives some items
@@ -351,15 +341,15 @@ Functions can use a `const sequence<std::string>&` paramter to receive a sequenc
 
 ### Returning sequences from functions
 
-In the ideal world we could just return a sequence from a function as
+In the ideal world we could just return a sequence from a function, as follows:
 
 ```c++
     sequence<std::string> getItems();  // This does not work
 ```
 
-This doesn't quite work for a few reasons. Firstly, `sequence<>` is an abstract class that can't be instantiated or returned. Secondly, we don't really know how the sequence should be stored - if at all. Finally, if the sequence is computed lazily, then it might contain dangling references or iterators that went out of scope when the function returns.
+This doesn't quite work for a few reasons. Firstly, `sequence<>` is an abstract class that can't be instantiated or returned. Secondly, we don't really know how the sequence should be stored - if at all. Finally, if the sequence is computed lazily, then it might contain dangling references or iterators that go out of scope when the function returns.
 
-Instead we use `class output_sequence<T>` to receive a sequence of type `T`. This is a very simple concept that works much like a visitor. It has only one method, `add()` to write an item to the sequence. We also provide the `<<` operator to write to the sequence if that is preferred.
+Instead we use `class output_sequence<T>` to receive a sequence of type `T`. This is a very simple class that works much like a visitor. `output_sequence<>` has only one method, `add()` to write an item to the sequence. There is also provide the `<<` operator to write to the sequence if that is preferred.
 
 ```c++
     void getItems(const output_sequence<std::string> & items)
@@ -371,7 +361,7 @@ Instead we use `class output_sequence<T>` to receive a sequence of type `T`. Thi
     }
 ```
 
-Output sequences are typically lambdas or write to containers. `writer()` is used to create an `output_sequence<>` that adds the element to a container, for example:
+Output sequences are usually lambdas or sinks to write to containers. `writer()` is used to create an `output_sequence<>` that adds the elements to a container, for example:
 
 ```c++
     std::vector<std::string> options;
@@ -379,21 +369,19 @@ Output sequences are typically lambdas or write to containers. `writer()` is use
     getItems(writer(options));
 ```
 
-This provides a uniform way to add data to any container as determined by the caller, not the callee. The `getItems()` function could equally work with a `std::list<std::string>` or a `std::unordered_set<std::string>` or any other suitable container.
+This approach allows the caller to control how the output data is stored or processed. `getItems()` could equally work with a `std::list<std::string>` or a `std::unordered_set<std::string>` or any other suitable container.
 
-`receiver()` is used to pass the elements to a lambda:
+`receiver()` is used to constuct an `output_sequence` from a lambda, to process elements one at a time:
 
 ```c++
     getItems(receiver([](const std::string & str) { std::cout << "The item was " << str << std::endl; }));
 ```
 
-This design is safe and efficient. There is an overhead of one virtual function call per element of the sequence, with the benefits of a simpler and more generic implementation. Virtual function calls can be avoided if you use templates (see the section on [#performance].)
-
 ## String and stream processing
 
 Sequences have another trick up their sleeve, which is the ability to read files and tokenize strings and streams. `seq(stream)` creates a sequence of the characters in the stream.
 
-The `split()` function converts a sequence of characters into a sequence of `std::string`.
+The `split()` function converts a sequence of characters into a sequence of `std::string`. It discards all of the given characters and groups anything else into tokens of `std::string`.
 
 ```c++
     std::ifstream file("data.txt");
@@ -406,7 +394,7 @@ Sequences should only be created on the stack as short-lived temporary objects. 
 
 The reason for this is to avoid the dangers of invalid iterators or references. Recall that sequences are lightweight wrappers, so if the underlying data goes out of scope then the sequence is undefined and the program will crash.
 
-Long term storage of sequence data should always be done using a C++ container.
+Long term storage of sequence data should be done using a C++ container.
 
 Sequences can be stored in `auto` stack objects, for example
 
@@ -500,7 +488,7 @@ Similarly, `writer` is a zero-overhead abstraction that only incurs additional v
 
 ### pointer_sequence
 
-Functions can use `const pointer_sequence<T> &` which is a more restricted sequence type, for more performance. This sequence type is stored as a pair of pointers `const T*`, so is suitable for the contents of a `std::vector` for example, and supports all regular sequence methods. Of course, the caller then needs to create the array in the first place which is not necessarily convenient or efficient.
+Functions can use a `const pointer_sequence<T> &` argument which is a more restricted sequence type, for better performance. This avoids virtual function calls, but it is more limited in its scope because not all sequences can be converted to a `pointer_sequence<>`.
 
 i.e.
 

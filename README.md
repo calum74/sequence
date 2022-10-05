@@ -4,7 +4,7 @@ Universal sequences in C++
 
 ## Getting started
 
-_Sequence_ is a header-only C++ library compatible with C++11 and higher. It has no other dependencies and should work fine on all platforms. Read the [Tutorial](docs/tutorial.md) to learn how to use this library. [Setup instructions](docs/setup.md) gives further build instructions if needed. Or, just head straight into the [samples] directory to see some code.
+_Sequence_ is a header-only C++ library compatible with C++11 and higher. It has no other dependencies and should work fine on all platforms. Read the [Tutorial](docs/tutorial.md) to learn how to use this library. [Setup instructions](docs/setup.md) gives further build instructions if needed. Or, just head straight over to the [samples](https://github.com/calum74/sequence/tree/main/samples) directory to see some code.
 
 ## Overview
 
@@ -13,15 +13,15 @@ _Sequence_ provides a simple, efficient and uniform way to create, pass and mani
 - Provide a simple and uniform way to pass sequences to functions,
 - Provide a [LINQ](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/)-style library for working with sequences
 
-It is motivated by the very basic frustration of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options, that are all incompatible.
+It is motivated by the very basic difficulty of "how do I actually pass a list to a function". Unfortunately, C++ provides far too many options that are all incompatible.
 
-To solve this, we introduce a universal sequence type, `sequence<T>` that represents any sequence of type `T`. `sequence<T>` unifies the many abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates. _Sequence_ wraps all of these in a unified abstraction.
+To solve this, we introduce the concept of _sequences_ to unifies the many abstractions that exist in C++, such as: iterator-pairs, ranges, C strings, arrays, pointers, containers, initializer lists, varargs and variadic templates. _Sequence_ wraps all of these in a unified abstraction.
 
-Sequences can be more efficient than containers because their contents are streamed and evaluated one element at a time without needing to store the entire sequence.
+Sequences can be more efficient than containers because their contents are evaluated and streamed one element at a time without needing to store the entire sequence.
 
 ### Example 1
 
-([source code](samples/example2.cpp))
+([Source code](samples/example2.cpp))
 
 The first example  shows processing of command-line arguments. It shows the creation of a sequence using `seq()`, and then the filtering and transformation of sequences using `where()`, `select()`, `skip()`, `as<>()`, `take_while()` and `skip_until()`. It also shows how sequences are passed into functions using `sequence<T>`.
 
@@ -80,7 +80,7 @@ int main(int argc, char**argv)
 
 ### Example 2
 
-([source code](samples/primes.cpp))
+([Source code](samples/primes.cpp))
 
 The second example shows a naive algorithm to produce a list of prime numbers. In regular C++ we could implement it like
 

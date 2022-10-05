@@ -98,7 +98,7 @@ void test_writers()
     std::vector<const char *> vec;
 
     copy(list("a", "b"), writer(vec));
-    assert(seq(vec) == list("a", "b"));
+    assert(seq(vec).as<std::string>() == list("a", "b"));
 
     copy(list("writer1","writer2"), receiver([](const char* str){std::cout << str << std::endl;}));
     copy(list("writer1","writer2"), receiver([&](const char* str){vec.push_back(str);}));

@@ -1,3 +1,5 @@
+// Implements a sequence that stores an internal copy of the data
+
 namespace sequences
 {
     template<typename Container>
@@ -13,8 +15,6 @@ namespace sequences
         // TODO: Do we want this?
         // Efficiency warning
         // stored_sequence(const stored_sequence & other) = delete;
-
-        operator iterator_sequence<typename Container::const_iterator>() { return {container.begin(), container.end()}; }
 
         const value_type * first()
         {

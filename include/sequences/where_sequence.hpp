@@ -1,3 +1,5 @@
+// Implements a sequence that filters another sequence
+
 namespace sequences
 {
     template<typename T, typename Seq, typename Predicate>

@@ -28,7 +28,6 @@
 #include "sequences/iterator_sequence.hpp"
 #include "sequences/where_sequence.hpp"
 #include "sequences/select_sequence.hpp"
-// #include "sequences/stored_array_sequence.hpp"
 #include "sequences/pointer_sequence.hpp"
 #include "sequences/take_sequence.hpp"
 #include "sequences/skip_sequence.hpp"
@@ -63,6 +62,7 @@ pointer_sequence<T> seq(const T (&items)[Size])
     return {items, items+Size};
 }
 
+// Constructs a sequence from a list
 template<typename T, typename...Ts>
 sequences::stored_sequence<std::array<T,1+sizeof...(Ts)>> list(T t, Ts... ts)
 {

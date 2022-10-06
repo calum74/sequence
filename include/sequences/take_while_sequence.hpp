@@ -1,3 +1,5 @@
+// Implements a sequence that takes from underlying sequence while a condition is true
+
 namespace sequences
 {
     template<typename Seq, typename Predicate>

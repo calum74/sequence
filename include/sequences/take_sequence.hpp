@@ -1,3 +1,5 @@
+// Implements a sequence that takes/limits the size of another sequence
+
 namespace sequences
 {
     template<typename T, typename Seq>

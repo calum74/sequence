@@ -43,4 +43,7 @@ namespace sequences
 
     template<typename Seq>
     class split_sequence;
+
+    template<typename Container>
+    class stored_sequence;
 }

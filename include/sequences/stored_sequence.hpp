@@ -3,10 +3,11 @@ namespace sequences
     template<typename Container>
     class stored_sequence : public base_sequence<typename Container::value_type, stored_sequence<Container>>
     {
+    public:
         Container container;
         typedef typename Container::value_type value_type;
         typename Container::const_iterator current;
-    public:
+
         stored_sequence(Container && c) : container(std::move(c)) {}
 
         // TODO: Do we want this?

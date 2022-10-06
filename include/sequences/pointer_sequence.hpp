@@ -1,3 +1,5 @@
+// Implements a pointer sequence - a sequence defined by a pair of pointers
+// This is potentially more efficient since it does not use virtual functions.
 
 template<typename T>
 class pointer_sequence : public sequences::base_sequence<T, pointer_sequence<T>>
@@ -6,7 +8,6 @@ class pointer_sequence : public sequences::base_sequence<T, pointer_sequence<T>>
 public:
     pointer_sequence(const T * a, const T *b) : a(a), b(b) {}
 
-    // TODO: I think this is unsafe
     template<int Size>
     pointer_sequence(const sequences::stored_array_sequence<T, Size> & seq) : a(seq.items), b(a+Size) {}
 

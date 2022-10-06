@@ -1,3 +1,5 @@
+// Implements a sequence that skips until a condition is met.
+
 namespace sequences
 {
     template<typename Seq, typename Predicate>

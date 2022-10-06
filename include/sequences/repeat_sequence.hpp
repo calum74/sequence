@@ -1,3 +1,5 @@
+// Implements the sequence to repeat a sequence a given number of times.
+
 namespace sequences
 {
     template<typename Seq>

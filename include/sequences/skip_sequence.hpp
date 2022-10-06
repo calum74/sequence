@@ -1,3 +1,5 @@
+// Implements a sequence that skips the first elements of another sequence
+
 namespace sequences
 {
     template<typename T, typename Seq>

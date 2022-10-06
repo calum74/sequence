@@ -1,4 +1,4 @@
-#include <type_traits>
+// Implements the sequence to select/map sequence elements using a functor.
 
 namespace sequences
 {

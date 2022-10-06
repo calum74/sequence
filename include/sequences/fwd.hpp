@@ -1,4 +1,4 @@
-#pragma once
+// Forward declarations of all the internal classes
 
 namespace sequences
 {

@@ -6,6 +6,8 @@ Tidy up everything
 - Docs
 - Code
 
+Test writing to std::map<> as an output_sequence.
+
 Tidy up the unit tests
 
 Tidy up the code

@@ -78,7 +78,7 @@ int aloop1()
     std::string result;
     for(int i=0; i<N2; ++i)
         result += 'a';
-    return result.size();
+    return (int)result.size();
 }
 
 // This is the Sequence implementation of Benchmark 2.
@@ -86,19 +86,19 @@ int aloop1()
 // It uses `accumulate()` which is faster than `aggregate` in this case.
 int aloop2()
 {
-    return list('a').repeat(N2).accumulate(std::string(), [](std::string & str, char ch) { str+=ch; }).size();
+    return (int)list('a').repeat(N2).accumulate(std::string(), [](std::string & str, char ch) { str+=ch; }).size();
 }
 
 // This is the Sequence implementation of Benchmark 2.
 // It uses `aggregate` which is significantly slower than `accumulate` in this case.
 int aloop3()
 {
-    return list('a').repeat(N2).aggregate(std::string(), [](const std::string & str, char ch) { return str+ch; }).size();
+    return (int)list('a').repeat(N2).aggregate(std::string(), [](const std::string & str, char ch) { return str+ch; }).size();
 }
 
 int processAs(const sequence<char> & items)
 {
-    return items.accumulate(std::string(), [](std::string & str, char ch) { str+=ch; }).size();
+    return (int)items.accumulate(std::string(), [](std::string & str, char ch) { str+=ch; }).size();
 }
 
 // This is a Sequence implementation of Benchmark 2, passing

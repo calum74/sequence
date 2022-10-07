@@ -40,6 +40,7 @@ void init(const pointer_sequence<const char *> & params)
         handleOption(p);
 }
 
+// Helper to validate object lifetimes.
 class Element
 {
     bool constructed;

@@ -1,3 +1,5 @@
+// Support for sequences that are created by lambdas
+// This feature is experimental
 namespace sequences
 {
     template<typename First, typename Next>

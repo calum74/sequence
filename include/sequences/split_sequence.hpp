@@ -1,3 +1,5 @@
+// Implements a sequence that splits a stream of characters into tokens
+
 namespace sequences
 {
     template<typename Seq>
@@ -6,8 +8,9 @@ namespace sequences
         Seq seq;
         const typename Seq::value_type * splitChars;
         typedef typename Seq::value_type char_type;
-        typedef std::basic_string<typename Seq::value_type> value_type;
     public:
+        typedef std::basic_string<typename Seq::value_type> value_type;
+
         split_sequence(const Seq & seq, const char_type * chs) : seq(seq), splitChars(chs) {}
 
         bool eof;
@@ -36,7 +39,6 @@ namespace sequences
                     token += *ch;
             }
             eof = true;
-
             return token.empty() ? nullptr : &token;
         }
 

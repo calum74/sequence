@@ -228,6 +228,7 @@ namespace sequences
         }
 
     private:
+        // Helper function to convert sequence to a different type
         template<typename U>
         struct asFn
         {
@@ -259,6 +260,8 @@ namespace sequences
 
         bool empty() const { return !any(); }
 
+        // Return the first item, or 'value'.
+        // Returns by value (not by reference) to avoid dangers of dangling references.
         value_type front_or_default(const T & value) const
         {
             auto c = self().first();
@@ -266,6 +269,8 @@ namespace sequences
             return *c;            
         }
 
+        // Return the last item, or 'value'.
+        // Returns by value (not by reference) to avoid dangers of dangling references.
         value_type back_or_default(const value_type & value) const
         {
             for(auto c = self().first(); c;)

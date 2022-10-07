@@ -1,3 +1,5 @@
+// Implements a sequence to concatenate two sequences
+
 namespace sequences
 {
     template<typename Seq1, typename Seq2>
@@ -32,6 +34,7 @@ namespace sequences
             return seq2.next();
         }
 
+        // Override for a more efficient implementation
         std::size_t size() const { return seq1.size() + seq2.size(); }
     };
 }

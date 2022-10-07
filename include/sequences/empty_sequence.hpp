@@ -1,3 +1,5 @@
+// Implements the empty sequence
+
 namespace sequences
 {
     template<typename T>

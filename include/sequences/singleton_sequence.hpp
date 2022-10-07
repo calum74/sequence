@@ -1,3 +1,4 @@
+// Implements a sequence of exactly one element
 namespace sequences
 {
     template<typename T>

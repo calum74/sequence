@@ -1,5 +1,6 @@
 namespace sequences
 {
+    // Wraps an int into an iterator, for use in a range.
     class int_iterator
     {
         int value;

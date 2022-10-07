@@ -1,3 +1,5 @@
+// Implements a sequence providing a merge/zip of two sequences.
+
 namespace sequences
 {
     template<typename Seq1, typename Seq2, typename Fn>
@@ -38,6 +40,5 @@ namespace sequences
             }
             return nullptr;
         }
-
     };
 }

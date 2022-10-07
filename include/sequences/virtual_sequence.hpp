@@ -1,3 +1,4 @@
+// Implement a sequence that wraps another sequence in virtual functions
 namespace sequences
 {
     template<typename T, typename Seq>
@@ -6,7 +7,6 @@ namespace sequences
         Seq seq;
     public:
         virtual_sequence(Seq seq) : seq(seq) {}
-        typedef virtual_sequence<T, Seq> stored_type;
 
         const T * first() override { return seq.first(); }
         const T * next() override { return seq.next(); }

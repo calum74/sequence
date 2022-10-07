@@ -11,7 +11,7 @@ Sequences are heavily inspired by C# [`IEnumerable<>`](https://learn.microsoft.c
 
 ## What is a sequence?
 
-A _sequence_ is just a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simple and powerful.
+A _sequence_ is a series of elements of the same type. A sequence can be empty or infinite. Sequences can be used in any situation where a list or collection is required, and replaces the multitude of incompatible alternatives in C++ with something consistent, universal, simple and powerful.
 
 Sequences can only be iterated in the forwards direction. Sequences are C++ sequential containers, with an input iterator type.
 
@@ -101,7 +101,7 @@ Lists are created using the `list()` function. `list()` is variadic, taking any 
     auto l = list<std::string>("cat", "dog");
 ```
 
-Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()`, `as()` and `merge()`. We will talk about these in [Transforming Sequences](#transforming-sequences).
+Other sequences can be created by transforming an existing sequence, using the variety of methods on a sequence such as `take()`, `skip()`, `where()`, `select()`, `take_while()`, `as()` and `merge()`. These are discussed in [Transforming Sequences](#transforming-sequences).
 
 ## Using sequences as containers
 
@@ -132,15 +132,15 @@ Sequences provide extra operations not found on normal containers:
 
 * `any()` - tests if the sequence contains any element / element matching a predicate
 * `count()` - counts the number of elements matching a predicate
-* `value_type front_or_default(const value_type&)`, `back_or_default()` - 
+* `front_or_default()`, `back_or_default()` - gets the item or returns a default value
 * `at()` - gets an element at a given position
 * `sum()` - sums all of the elements
 * `aggregate()`, `accumulate()` - runs an arbitrary function over all elements and computes a result
 
-See [transformations.cpp](samples/transformations.cpp) for examples on how to use these functions.
+See [operations.cpp](../samples/operations.cpp) for examples on how to use these functions.
 
 ```c++
-   // front() gets the first element of a list
+    // front() gets the first element of a list
     std::cout << s.front() << std::endl;
 
     // back() gets the last element in the list
@@ -263,7 +263,7 @@ See [transformations.cpp](../samples/transformations.cpp) for examples of transf
 
 ## Writing sequences
 
-Sequences don't actually store any data, so standard C++ containers should be used for the storage of data.
+Sequences don't actually store any data, so standard C++ containers should be used for storage.
 
 There are a number of ways to write a sequence `s` to a container `vec`:
 
@@ -298,7 +298,7 @@ A major use case for sequences is passing lists to and from functions. Recall th
     void setItems(const std::string * array, const std::string * end);
 ```
 
-and also different possible ways of returning lists:
+and also different possible ways of returning a list:
 
 ```c++
     std::vector<std::string> getItems();
@@ -314,15 +314,18 @@ and also different possible ways of returning lists:
 
 The drawback with all of these approaches is that they are incompatible - you need to pick a representation up front, provide multiple implementations, or implement your code in header files. They are not always efficient either - sometimes it's just not necessary to store the data in a container, and there is overhead in creating a list in a different container to the one you already have.
 
-Using sequences these methods can be written with the much simpler `sequence<T>` and `output_sequence<T>`:
+With sequences these methods can be written with the much simpler `sequence<T>` and `output_sequence<T>`:
 
 ```c++
     void setItems(const sequence<std::string> & items);
     void getItems(const output_sequence<std::string> & items);
 ```
+
+`sequence<T>` and `output_sequence<T>` provide a consistent wrapper for all of these different approaches.
+
 ### Passing sequences into functions
 
-Functions can use a `const sequence<std::string>&` parameter to receive a sequence. For example,
+Functions can use a `const sequence<T>&` parameter to receive a sequence. For example,
 
 ```c++
     // Somewhere to store the items
@@ -349,7 +352,7 @@ In the ideal world we could just return a sequence from a function, as follows:
 
 This doesn't quite work for a few reasons. Firstly, `sequence<>` is an abstract class that can't be instantiated or returned. Secondly, we don't really know how the sequence should be stored - if at all. Finally, if the sequence is computed lazily, then it might contain dangling references or iterators that go out of scope when the function returns.
 
-Instead we use `class output_sequence<T>` to receive a sequence of type `T`. This is a very simple class that works much like a visitor. `output_sequence<>` has only one method, `add()` to write an item to the sequence. There is also provide the `<<` operator to write to the sequence if that is preferred.
+Instead we use `class output_sequence<T>` to receive a sequence of type `T`. This is a very simple class that works much like a visitor. `output_sequence<>` has only one method, `add()` to write an item to the sequence. There is also the `<<` operator to write an item or a sequence.
 
 ```c++
     void getItems(const output_sequence<std::string> & items)
@@ -385,7 +388,7 @@ The `split()` function converts a sequence of characters into a sequence of `std
 
 ```c++
     std::ifstream file("data.txt");
-    auto rows = seq(file).split("\r\n");
+    auto lines = seq(file).split("\r\n");
 ```
 
 ## Sequence lifetime
@@ -394,7 +397,7 @@ Sequences should only be created on the stack as short-lived temporary objects. 
 
 The reason for this is to avoid the dangers of invalid iterators or references. Recall that sequences are lightweight wrappers, so if the underlying data goes out of scope then the sequence is undefined and the program will crash.
 
-Long term storage of sequence data should be done using a C++ container.
+Long term storage of sequence data should be done with a C++ container.
 
 Sequences can be stored in `auto` stack objects, for example
 
@@ -407,9 +410,9 @@ Sequences can be stored in `auto` stack objects, for example
         ...
 ```
 
-Sequences are only as thread-safe as the collections they are iterating. Generally, this offers very few guarantees, and it is a bad idea to modify the contents of a sequence you are currently iterating. If the underlying data is `const` then multiple sequences (in possibly different threads) will not interfere and can read the data safely. The same sequence must not be iterated reentrantly or in multiple threads.
+Sequences are only as thread-safe as the collections they are iterating. Generally, this offers very few guarantees, and it is a bad idea to modify the contents of a sequence you are currently iterating, due to iterators being invalidated. If the underlying data is `const` then multiple sequences (in possibly different threads) will not interfere with each other and can read the data safely. The same sequence must not be iterated reentrantly or in multiple threads.
 
-To avoid these problems, simply create a new sequence in each thread, and do not pass references to sequences (`const sequence<T>&`) between threads.
+To avoid these problems, create a different sequence in each thread, and do not pass references to sequences (`const sequence<T>&`) between threads.
 
 As an example, `computeAsyncUnsafe()` exhibits undefined behaviour because the underlying sequence is iterated concurrently.
 
@@ -424,7 +427,7 @@ int computeAsyncUnsafe(const sequence<int> & values) {
 }
 ```
 
-The solution is to always capture the sequence by value (`[=]() { return values.sum(); }`), but this means changing the function signature to a type that can be copied by value, for example
+The solution is to always capture the sequence by value (`[=]`), but this means changing the function signature to a type that can be copied by value, for example
 
 ```c++
 // A safe version of computeAsyncUnsafe(), ensuring that the sequence
@@ -488,15 +491,13 @@ Similarly, `writer` is a zero-overhead abstraction that only incurs additional v
 
 ### pointer_sequence
 
-Functions can use a `const pointer_sequence<T> &` argument which is a more restricted sequence type, for better performance. This avoids virtual function calls, but it is more limited in its scope because not all sequences can be converted to a `pointer_sequence<>`.
-
-i.e.
+Functions can use a `const pointer_sequence<T> &` argument which is a more restricted sequence type, for better performance. This avoids virtual function calls, but it is more limited in its scope because not all sequences can be converted to a `pointer_sequence<>`. For example,
 
 ```c++
 void setItems(const pointer_sequence<const char*> & p);
 ```
 
-to avoid the overheads of function calls completely, we can template the function. i.e.
+To avoid the overheads of function calls completely, we can template the function. i.e.
 
 ```c++
 template<typename Seq>
